@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from webfiles.config import Config
 
+# ToDo: Replace DB with API Calls
+
 db = SQLAlchemy()
 
 login_manager = LoginManager()
