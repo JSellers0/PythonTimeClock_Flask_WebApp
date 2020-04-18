@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <form method="POST", action="">
+        {{ form.hidden_tag() }}
+        {{ form.new_client }}
+        {{ form.new_project }} <br />
+        {{ form.submit }}
+    </form>
+    <a href={{ url_for( "start" ) }}>Back</a>
+</body>
+</html>

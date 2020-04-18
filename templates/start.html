@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Start Timing</h1>
+    <p>Select a client and project and click Start</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST", action="">
+        {{ form.hidden_tag() }}
+        {{ form.client_list(size=15) }}
+        {{ form.project_list(size=15) }} <br />
+        {{ form.start }}
+    </form>
+    <p>or click New to enter new clients/projects</p>
+    <a href={{ url_for( "new" ) }}>New</a>
+    <a href={{ url_for( "main" ) }}>Back</a>
+    
+</body>
+</html>
