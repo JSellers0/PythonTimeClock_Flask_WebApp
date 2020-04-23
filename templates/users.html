@@ -1,0 +1,54 @@
+{% extends "parent.html" %}
+{% block title %}Reporting{% endblock %}
+{% block head %}
+{% endblock %}
+{% block page_name %}Testing It Out{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <input id="url_user_id" type="hidden" value="{{ userid }}" />
+        <div class="section editor">
+            <div>
+                <span>UserID:</span>
+                <span id="userid"></span>
+            </div>
+            <label for="user_name">Username
+                <input id="user_name" type="text" />
+            </label>
+            <br />
+            <label for="email">Email Address
+                <input id="email" type="text" />
+            </label>
+            <br />
+            <button id="create">Create</button>
+            <button id="update">Update</button>
+        </div>
+        <div class="users">
+            <table>
+                <caption>Users</caption>
+                <thead>
+                    <tr>
+                        <th>One</th>
+                        <th>User</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="error">
+
+        </div>
+    </div>
+    <div class="error">
+    </div>
+{% endblock body %}
+
+{% block javascript %}
+{{ super() }}
+<script type="module">
+    // Give the imported MVC components a namespace
+    import * as MVC from "/static/js/users.js";
+
+    // Create an inentional global variable referencing the import
+    window.mvc = MVC;
+</script>
+{% endblock %}

@@ -1,6 +1,10 @@
-from webfiles import create_app
+from flask import Flask, render_template
 
-app = create_app()
+app = Flask(__name__)
+
+@app.route("/users")
+def home():
+    return render_template("users.html")
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
