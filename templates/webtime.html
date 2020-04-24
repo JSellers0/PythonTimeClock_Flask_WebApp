@@ -1,0 +1,33 @@
+{% extends "parent.html" %}
+{% block title %}Python WebTime{% endblock %}
+{% block head %}
+{% endblock %}
+{% block page_name %}Webtime_Main{% endblock %}
+
+{% block body %}
+    <h1>Welcome to Python/Flask Time Clock</h1>
+    <div>
+        <span id="messages"></span>
+    </div>
+        <div id="controlpanel">
+            <a href={{ url_for( "start" ) }} class="control" id="start">Start</a>
+        <button class="control" id="stop">Stop</button>
+        <a href={{ url_for( "adjust" ) }} class="control" id="adjust">Adjust</a>
+        <a href={{ url_for( "report" ) }} class="control" id="report">Report</a>
+        <!-- Should make these Nav linkds -->
+        <a href={{ url_for( "register" ) }} class="nav" id="register">Register</a>
+        <a href={{ url_for( "login" ) }} class="nav" id="login">Login</a>
+        <a href={{ url_for( "logout" ) }} class="nav" id="logout">Logout</a>
+    </div>
+{% endblock body %}
+
+{% block javascript %}
+{{ super() }}
+<script type="module">
+    // Give the imported MVC components a namespace
+    import * as MVC from "/static/js/webtime.js";
+
+    // Create an intentional global variable referencing the import
+    window.mvc = MVC;
+</script>
+{% endblock %}

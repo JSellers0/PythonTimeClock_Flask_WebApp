@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="JSellers0">
     {% block head %}
     <title>{% block title %}{% endblock %}</title>
+    <script type="text/javascript" src="../static/js/endpoint.js"></script>
     {% endblock head %}
 </head>
 <body>
@@ -12,7 +14,7 @@
             <a href="/">Home</a>
         </span>
         <span class="page_name">
-            <div></div>
+            <div>{% block page_name %}{% endblock %}</div>
         </span>
         <span class="spacer"></span>
     </div>
