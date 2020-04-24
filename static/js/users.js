@@ -8,7 +8,21 @@ class Model {
                 "accepts": "application/json"
             }
         };
-        let response = await fetch("http://ec2-54-166-143-158.compute-1.amazonaws.com/api/users", options);
+        let response = await fetch("http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users", options);
+        let data = await response.json();
+        return data;
+    }
+
+    async readOne(userid) {
+        let options = {
+            method: "GET",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "accepts": "application/json"
+            }
+        };
+        let response = await fetch(`http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users/${userid}`, options);
         let data = await response.json();
         return data;
     }
@@ -23,28 +37,65 @@ class Model {
             },
             body: JSON.stringify(user)
         };
-        let response = await fetch("http://ec2-54-166-143-158.compute-1.amazonaws.com/api/users", options);
+        let response = await fetch("http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users", options);
         let data = await response.json();
         return data;
+    }
+
+    async update(user) {
+        let options = {
+            method: "POST",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "accepts": "application/json"
+            },
+            body: JSON.stringify(user)
+        };
+        let response = await fetch(`http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users/${user.userid}`, options);
+        let data = await response.json();
+        return data;
+    }
+
+    async delete(userid) {
+        let options = {
+            method: "DELETE",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "accepts": "application/json"
+            }
+        };
+        let response = await fetch(`http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users/${userid}`, options);
+        return response;
     }
 
 }
 
 class View {
     constructor() {
-        this.NEW_NOTE = 0;
-        this.EXISTING_NOTE = 1;
         this.table = document.querySelector(".users table");
+        this.error = document.querySelector(".error");
         this.userid = document.getElementById("userid");
         this.user_name = document.getElementById("user_name");
         this.email = document.getElementById("email");
         this.createButton = document.getElementById("create");
+        this.updateButton = document.getElementById("update");
+        this.deleteButton = document.getElementById("delete");
+        this.resetButton = document.getElementById("reset");
     }
 
     reset() {
         this.userid.textContent = "";
-        this.user_name.textContent = "";
-        this.email.textContent = "";
+        this.user_name.value = "";
+        this.email.value = "";
+        this.user_name.focus();
+    }
+
+    updateEditor(user) {
+        this.userid.textContent = user.userid;
+        this.user_name.value = user.user_name;
+        this.email.value = user.email;
         this.user_name.focus();
     }
 
@@ -55,8 +106,9 @@ class View {
         // Iterate over the users and build the table
         users.forEach((user) => {
             html += `
-            <tr data-user_id="${user.userid}" data-user_name="${user.user_name}" data-email="${user.email}>
-                <td class="name">${user.user_name}</td>
+            <tr data-userid="${user.userid}" data-user_name="${user.user_name}" data-email="${user.email}">
+                <td class="user_name">${user.user_name}</td>
+                <td class="email">${user.email}</td>
             </tr>`;
         });
         // Is there currently a tbody in the table?
@@ -64,8 +116,18 @@ class View {
             this.table.removeChild(this.table.getElementsByTagName("tbody")[0]);
         }
         // Update tbody with our new content
-        tobdy = this.table.createTBody();
+        tbody = this.table.createTBody();
         tbody.innerHTML = html;
+    }
+
+    errorMessage(message) {
+        this.error.innerHTML = message;
+        this.error.classList.add("visible");
+        this.error.classList.remove("hidden");
+        setTimeout(() => {
+            this.error.classList.add("hidden");
+            this.error.classList.remove("visible");
+        }, 2000);
     }
 }
 
@@ -79,7 +141,13 @@ class Controller {
 
     async initialize() {
         await this.initializeTable();
+        this.initializeTableEvents();
+        //this.initializeCreateEvent();
+        //this.initializeUpdateEvent();
+        //this.initializeDeleteEvent();
+        this.initializeResetEvent();
     }
+
     async initializeTable() {
         try {
             let urlUserID = parseInt(document.getElementById("url_user_id").value),
@@ -98,11 +166,33 @@ class Controller {
             }
             this.initializeTableEvents();
         } catch(err) {
-            
+            this.view.errorMessage(err);
         }
     }
-}
 
+    initializeTableEvents() {
+        document.querySelector("table tbody").addEventListener("click", (evt) => {
+            let target = evt.target.parentElement,
+                userid = target.getAttribute("data-userid"),
+                user_name = target.getAttribute("data-user_name"),
+                email = target.getAttribute("data-email");
+
+            this.view.updateEditor({
+                userid: userid,
+                user_name: user_name,
+                email: email
+            });
+
+        });
+    }
+
+    initializeResetEvent() {
+        document.getElementById("reset").addEventListener("click", async (evt) => {
+            evt.preventDefault();
+            this.view.reset();
+        });
+    }
+}
 
 // Create the MVC components
 const model = new Model();
