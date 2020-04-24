@@ -120,7 +120,7 @@ class ProjectsModel {
     }
 
     async update(projectid, project) {
-        // Doesn't Exist Yet!
+        // ToDo: Add update to projects object/swagger file.
         let options = {
             method: "PUT",
             cache: "no-cache",
