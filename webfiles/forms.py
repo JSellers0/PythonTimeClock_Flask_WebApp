@@ -2,12 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, StringField
 from wtforms.validators import DataRequired
 
-class MainForm(FlaskForm):
-    start = SubmitField("Start")
-    stop = SubmitField("Stop")
-    adjust = SubmitField("Adjust")
-    report = SubmitField("Report")
-
 class StartForm(FlaskForm):
     client_list = SelectField(u"Select a Client", validators=[DataRequired()])
     project_list = SelectField(u"Select a Project", validators=[DataRequired()])
