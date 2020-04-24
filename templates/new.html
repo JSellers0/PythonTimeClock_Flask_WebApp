@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <form method="POST", action="">
-        {{ form.hidden_tag() }}
-        {{ form.new_client }}
-        {{ form.new_project }} <br />
-        {{ form.submit }}
-    </form>
-    <a href={{ url_for( "start" ) }}>Back</a>
-</body>
-</html>
+{% extends "parent.html" %}
+{% block title %}Python WebTime{% endblock %}
+{% block head %}
+{% endblock %}
+{% block page_name %}Add New Items{% endblock %}
+
+{% block body %}
+<a href={{ url_for( "webtime" ) }}>Main</a>
+<p>New Client:</p>
+<p>New Project</p>
+<button>Submit</button>
+<a href={{ url_for( "start" ) }}>Back</a>
+{% endblock body %}
