@@ -1,76 +1,4 @@
-class Model {
-    async read() {
-        let options = {
-            method: "GET",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accepts": "application/json"
-            }
-        };
-        let response = await fetch("http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users", options);
-        let data = await response.json();
-        return data;
-    }
-
-    async readOne(userid) {
-        let options = {
-            method: "GET",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accepts": "application/json"
-            }
-        };
-        let response = await fetch(`http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users/${userid}`, options);
-        let data = await response.json();
-        return data;
-    }
-
-    async create(user) {
-        let options = {
-            method: "POST",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accepts": "application/json"
-            },
-            body: JSON.stringify(user)
-        };
-        let response = await fetch("http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users", options);
-        let data = await response.json();
-        return data;
-    }
-
-    async update(user) {
-        let options = {
-            method: "POST",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accepts": "application/json"
-            },
-            body: JSON.stringify(user)
-        };
-        let response = await fetch(`http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users/${user.userid}`, options);
-        let data = await response.json();
-        return data;
-    }
-
-    async delete(userid) {
-        let options = {
-            method: "DELETE",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accepts": "application/json"
-            }
-        };
-        let response = await fetch(`http://ec2-35-175-208-202.compute-1.amazonaws.com/api/users/${userid}`, options);
-        return response;
-    }
-
-}
+import { user_model } from "./models.js"
 
 class View {
     constructor() {
@@ -194,14 +122,13 @@ class Controller {
     }
 }
 
-// Create the MVC components
-const model = new Model();
+// Create the VC components
 const view = new View();
-const controller = new Controller(model, view);
+const controller = new Controller(user_model, view);
 
 // Export the MVC components as the default
 export default {
-    model,
+    user_model,
     view,
     controller
 };
