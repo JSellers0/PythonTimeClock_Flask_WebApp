@@ -2,7 +2,7 @@
 {% block title %}Python WebTime{% endblock %}
 {% block head %}
 {% endblock %}
-{% block page_name %}Welcome to Python/Flask Time Clock{% endblock %}
+{% block page_name %}Python/Flask Time Clock{% endblock %}
 
 {% block body %}
     <div>
@@ -10,17 +10,19 @@
     </div>
     <!-- ToDo: Hide when user not logged in -->
     <!-- ToDo: Build section to inform user to register or log in -->
+    {% if current_user.is_authenticated %}
     <div id="controlpanel">
         <a href={{ url_for( "start" ) }} class="control" id="start">Start</a>
         <button class="control" id="stop">Stop</button>
         <a href={{ url_for( "adjust" ) }} class="control" id="adjust">Adjust</a>
         <a href={{ url_for( "report" ) }} class="control" id="report">Report</a>
-        <!-- ToDo: Make these Nav links -->
         <!-- ToDo: Steal user system from Flask tutorial -->
-        <a href={{ url_for( "register" ) }} class="nav" id="register">Register</a>
-        <a href={{ url_for( "login" ) }} class="nav" id="login">Login</a>
-        <a href={{ url_for( "logout" ) }} class="nav" id="logout">Logout</a>
     </div>
+    {% else %}
+    <div id="container">
+        <h1>Register or Login to use TimeClock</h1>
+    </div>
+    {% endif %}
 {% endblock body %}
 
 {% block javascript %}

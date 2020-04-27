@@ -3,26 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="JSellers0">
-    {% block head %}
-    <title>{% block title %}{% endblock %}</title>
-    <script type="text/javascript" src="../static/js/endpoint.js"></script>
-    {% endblock head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href={{ url_for( "static", filename="css/main.css" ) }}>
 </head>
 <body>
-    <div class="navigation">
-        <span class="buttons">
-            <a href="/webtime">Home</a>
-        </span>
-        <span class="page_name">
-            <div>{% block page_name %}{% endblock %}</div>
-        </span>
-        <span class="spacer"></span>
-    </div>
-
-    {% block body %}
-    {% endblock %}
+    <header class="site-header">
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <span class="navbar-brand mr-4">{% block page_name %}{% endblock %}</span>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controld="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    {% if current_user.is_authenticated %}
+                        <a class="nav-item nav-link" href={{ url_for( "users" ) }}>Account</a>
+                        <a class="nav-item nav-link" href={{ url_for( "logout" ) }}>Logout</a>
+                    {% else %}
+                        <a class="nav-item nav-link" href={{ url_for( "login" ) }}>Login</a>
+                        <a class="nav-item nav-link" href={{ url_for( "register" ) }}>Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    </header>
+    <main role="main" class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        {% block body %}
+        {% endblock %}
+    </main>
 </body>
 
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 {% block javascript %}
 {% endblock %}
 
