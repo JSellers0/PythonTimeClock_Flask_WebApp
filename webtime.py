@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_required, current_user, logout_user,
 
 from flask_bcrypt import Bcrypt
 
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, NewForm, StartForm
 from models import MyUser
 
 app = Flask(__name__)
@@ -74,12 +74,38 @@ def users():
 @login_required
 @app.route("/webtime/start", methods=["POST", "GET"])
 def start():
-    return render_template("start.html")
+    form = StartForm()
+    return render_template("start.html", form=form)
 
 @login_required
 @app.route("/webtime/new", methods=["POST", "GET"])
 def new():
-    return render_template("new.html")
+    form = NewForm()
+    if form.validate_on_submit():
+        if form.new_client.data:
+            resp = requests.post(aws_route+"/clients", json={"client_name": form.new_client.data})
+            if resp == 201:
+                client_success = True
+            else:
+                client_success = False
+        else:
+            no_client = True
+        if form.new_project.data:
+            resp = requests.post(aws_route+"/projects", json={"project_name": form.new_project.data})
+            if resp == 201:
+                project_success = True
+            else:
+                project_success = False
+        else:
+            no_project = True
+        if (client_success or no_client) and (project_success or no_project):
+            flash("New items successfully added!", "success")
+            return redirect(url_for("start"))
+        elif not client_success:
+            flash("The client name you submitted already exists")
+        elif not project_success:
+            flash("The project name you submitted alread exists.")
+    return render_template("new.html", form=form)
 
 @login_required
 @app.route("/webtime/adjust")

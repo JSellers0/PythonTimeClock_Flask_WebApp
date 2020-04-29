@@ -5,9 +5,45 @@
 {% block page_name %}Add New Items{% endblock %}
 
 {% block body %}
-<a href={{ url_for( "webtime" ) }}>Main</a>
-<p>New Client:</p>
-<p>New Project</p>
-<button>Submit</button>
-<a href={{ url_for( "start" ) }}>Back</a>
+<div class="content-section">
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+        <legend>Enter Values for New Client and/or Project</legend>
+        <div class="form-group">
+            {{ form.new_client.label(class="form-control-label") }}
+            {% if form.new_client.errors %}
+                {{ form.new_client(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.new_client.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.new_client(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.new_project.label(class="form-control-label") }}
+            {% if form.new_project.errors %}
+                {{ form.new_project(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.new_project.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.new_project(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+    </fieldset>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+        <a href={{ url_for( "start" ) }} class="btn btn-outline-info">Cancel</a>
+    </div>
+</form>
+<p>
+    <a href={{ url_for( "webtime" ) }}>Back to Main Menu</a>
+</p>
+</div>
 {% endblock body %}

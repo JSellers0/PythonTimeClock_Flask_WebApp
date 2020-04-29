@@ -16,3 +16,13 @@ class RegisterForm(FlaskForm):
                                     validators=[DataRequired(), EqualTo("password")])
 
     submit = SubmitField("Register")
+
+class StartField(FlaskForm):
+    client = StringField("Client", validators=[DataRequired()])
+    project = StringField("Project", validators=[DataRequired()])
+    submit = SubmitField("Start")
+
+class NewForm(FlaskForm):
+    new_client = StringField("New Client")
+    new_project = StringField("New Project")
+    submit = SubmitField("Submit")

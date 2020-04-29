@@ -5,19 +5,26 @@
 {% block page_name %}Start Timing{% endblock %}
 
 {% block body %}
-<p>Select a client and project and click Start</p>
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+<p></p>
+<div class="content-section">
 <form method="POST", action="">
+    <fieldset class="form-group">
+        <legend>Select a Client and Project then click Start</legend>
+        <div class="form-group">
+            {{ form.client.label(class="form-control-label") }}
+        </div>
+
+        <input name="project", list="project_list">
+        <datalist id="project_list">
+        </datalist>
+    </fieldset>
+    <input type="submit" value="Start">
+    
 </form>
-<p>or click New to enter new clients/projects</p>
-<a href={{ url_for( "new" ) }}>New</a>
-<a href={{ url_for( "webtime" ) }}>Back</a>
+<p>
+    or click here to enter new clients/projects: <a href={{ url_for( "new" ) }}>Add New Options</a>
+</p>
+
+<a href={{ url_for( "webtime" ) }}>Back to Main Menu</a>
+</div>
 {% endblock body %}
