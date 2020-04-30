@@ -5,24 +5,29 @@
 {% block page_name %}Python/Flask Time Clock{% endblock %}
 
 {% block body %}
-    <div>
-        <span id="messages"></span>
-    </div>
-    <!-- ToDo: Hide when user not logged in -->
-    <!-- ToDo: Build section to inform user to register or log in -->
+<div class="content-section">
     {% if current_user.is_authenticated %}
-    <div id="controlpanel">
-        <a href={{ url_for( "start" ) }} class="control" id="start">Start</a>
-        <button class="control" id="stop">Stop</button>
-        <a href={{ url_for( "adjust" ) }} class="control" id="adjust">Adjust</a>
-        <a href={{ url_for( "report" ) }} class="control" id="report">Report</a>
+    <div>
+        {% if "Click" in message %}
+            <h1 id="message">{{ message }}</h1>
+        {% else %}
+            <h2 id="message1">{{ message[ : message.index("at")] }}<br/>
+            {{ message[message.index("at") : ] }}</h2>
+        {% endif %}
+    </div><br/>
+    <div id="controlpanel" class="form-group">
+        <a class="btn btn-outline-info" href={{ url_for( "start" ) }} id="start">Start</a>
+        <a class="btn btn-outline-info" href={{ url_for( "stop" ) }} id="start">Stop</a>
+        <a class="btn btn-outline-info" href={{ url_for( "adjust" ) }} id="adjust">Adjust</a>
+        <a class="btn btn-outline-info" href={{ url_for( "report" ) }} id="report">Report</a>
         <!-- ToDo: Steal user system from Flask tutorial -->
     </div>
     {% else %}
-    <div id="container">
+    <div id="media content-section">
         <h1>Register or Login to use TimeClock</h1>
     </div>
     {% endif %}
+</div>
 {% endblock body %}
 
 {% block javascript %}
