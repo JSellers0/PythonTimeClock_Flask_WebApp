@@ -17,7 +17,7 @@ class RegisterForm(FlaskForm):
 
     submit = SubmitField("Register")
 
-class StartField(FlaskForm):
+class StartForm(FlaskForm):
     client = StringField("Client", validators=[DataRequired()])
     project = StringField("Project", validators=[DataRequired()])
     submit = SubmitField("Start")
