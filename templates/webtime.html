@@ -10,14 +10,22 @@
     <div>
         {% if "Click" in message %}
             <h1 id="message">{{ message }}</h1>
-        {% else %}
-            <h2 id="message1">{{ message[ : message.index("at")] }}<br/>
-            {{ message[message.index("at") : ] }}</h2>
+        {% elif "at" in message %}
+            <h2 id="message">
+                {{ message[ : message.index("\n")] }}<br/>
+                {{ message[message.index("\n") : message.index("at")] }}<br/>
+                {{ message[message.index("at") : ] }}
+            </h2>
+        {% elif "Stopped" in message %}
+            <h2 id="message">
+                {{ message[ : message.index("\n")] }}<br/>
+                {{ message[message.index("\n") : ] }}
+            </h2>
         {% endif %}
     </div><br/>
     <div id="controlpanel" class="form-group">
         <a class="btn btn-outline-info" href={{ url_for( "start" ) }} id="start">Start</a>
-        <a class="btn btn-outline-info" href={{ url_for( "stop" ) }} id="start">Stop</a>
+        <a class="btn btn-outline-info" href={{ url_for( "stop" ) }} id="stop">Stop</a>
         <a class="btn btn-outline-info" href={{ url_for( "adjust" ) }} id="adjust">Adjust</a>
         <a class="btn btn-outline-info" href={{ url_for( "report" ) }} id="report">Report</a>
     </div>
@@ -28,14 +36,3 @@
     {% endif %}
 </div>
 {% endblock body %}
-
-{% block javascript %}
-{{ super() }}
-<script type="module">
-    // Give the imported MVC components a namespace
-    import * as MVC from "/static/js/webtime.js";
-
-    // Create an intentional global variable referencing the import
-    window.mvc = MVC;
-</script>
-{% endblock %}
