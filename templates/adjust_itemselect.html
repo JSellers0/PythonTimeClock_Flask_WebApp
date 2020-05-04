@@ -1,0 +1,79 @@
+{% extends "parent.html" %}
+{% block title %}Python WebTime{% endblock %}
+{% block head %}
+{% endblock %}
+{% block page_name %}Edit Notes{% endblock %}
+
+{% block body %}
+<div class="content-section">
+    {% if item_type == "times" %}
+    <table id="time_table" style="width:100%", class=form-group>
+        <tr>
+            <th>Timelog ID</th>
+            <th>Project Name</th>
+            <th>Task Name</th>
+            <th>Note Name</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+        {% for row in items %}
+        <tr>
+            <td>{{ row.get("timelogid") }}</td>
+            <td>{{ row.get("project_name") }}</td>
+            <td>{{ row.get("task_name") }}</td>
+            <td>{{ row.get("note_name") }}</td>
+            <td>{{ row.get("start") }}</td>
+            <td>{{ row.get("stop") }}</td>
+            <td><button>Update Button</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% elif item_type == "projects" %}
+    <table id="project_table" style="width:100%", class=form-group>
+        <tr>
+            <th>Project ID</th>
+            <th>Project Name</th>
+        </tr>
+        {% for row in items %}
+        <tr>
+            <td>{{ row.get("projectid") }}</td>
+            <td>{{ row.get("project_name") }}</td>
+            <td><button>Update Button</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% elif item_type == "tasks" %}
+    <table id="task_table" style="width:100%", class=form-group>
+        <tr>
+            <th>Project ID</th>
+            <th>Project Name</th>
+        </tr>
+        {% for row in items %}
+        <tr>
+            <td>{{ row.get("taskid") }}</td>
+            <td>{{ row.get("task_name") }}</td>
+            <td><button>Update Button</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% elif item_type == "notes" %}
+    <table id="note_table" style="width:100%", class=form-group>
+        <tr>
+            <th>Project ID</th>
+            <th>Project Name</th>
+        </tr>
+        {% for row in items %}
+        <tr>
+            <td>{{ row.get("noteid") }}</td>
+            <td>{{ row.get("note_name") }}</td>
+            <td><button>Update Button</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    <a class="btn btn-outline-info" href={{ url_for( "adjust" ) }} id="cancel">Cancel</a>
+</div>
+<p>
+    <a href={{ url_for( "webtime" ) }}>Back to Main Menu</a>
+</p>
+{% endblock body %}

@@ -1,0 +1,27 @@
+{% extends "parent.html" %}
+{% block title %}Python WebTime{% endblock %}
+{% block head %}
+{% endblock %}
+{% block page_name %}Adjustment Timestamps{% endblock %}
+
+{% block body %}
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend>Select the Date you want to adjust:</legend>
+            <div class="form-group">
+                {{ form.range_begin.label(class="form-control-label") }}
+                {{ form.range_begin(class="form-control form-control-lg") }}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+            <a class="btn btn-outline-info" href={{ url_for( "adjust" ) }} id="cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+<p>
+    <a href={{ url_for( "webtime" ) }}>Back to Main Menu</a>
+</p>
+{% endblock body %}
