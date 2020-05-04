@@ -96,16 +96,6 @@ class TimeClock():
         else:
             flash("User Not Recognized.  Please check your info or Register an Account!", "danger")
             return None
-
-    def get_start_lists(self):
-        self.projects = self.get_projects()
-        self.tasks = self.get_tasks()
-        self.notes = self.get_notes()
-        return (
-            [project["project_name"] for project in self.projects],
-            [task["task_name"] for task in self.tasks],
-            [note["note_name"] for note in self.notes]
-        )
     
     def get_projects(self):
         response = requests.get(aws_route + "/projects")
@@ -151,20 +141,30 @@ class TimeClock():
             return response.json()["noteid"]
         else:
             return None
+
+    def get_list(self, list_name):
+        if list_name == "projects":
+            self.projects = self.get_projects()
+            return [project["project_name"] for project in self.projects]
+        elif list_name == "tasks":
+            self.tasks = self.get_tasks()
+            return [task["task_name"] for task in self.tasks]
+        elif list_name == "notes":
+            self.notes = self.get_notes()
+            return [note["note_name"] for note in self.notes]
     
     def start_timing(self, form):
-        # ToDo: self.get_list("project")
-        if (form.project.data.lower() in [project["project_name"] for project in self.projects]):
+        if (form.project.data.lower() in self.get_list("projects")):
             projectid = self.projects[[project["project_name"] for project in self.projects].index(form.project.data.lower())]["projectid"]
         else:
             projectid = self.create_project(form.project.data.lower())
 
-        if (form.task.data.lower() in [task["task_name"] for task in self.tasks]):
+        if (form.task.data.lower() in self.get_list("tasks")):
             taskid = self.tasks[[task["task_name"] for task in self.tasks].index(form.task.data.lower())]["taskid"]
         else:
             taskid = self.create_task(form.task.data.lower())
 
-        if (form.note.data.lower() in [note["note_name"] for note in self.notes]):
+        if (form.note.data.lower() in self.get_list("notes")):
             noteid = self.notes[[note["note_name"] for note in self.notes].index(form.note.data.lower())]["noteid"]
         else:
             noteid = self.create_note(form.note.data.lower())
@@ -229,16 +229,26 @@ class TimeClock():
                 dt.min.time()
             ),
             "utc"
-            ).strftime("%Y-%m-%d %H:%M:%S")
+            ).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
-        range_end = (convert_timezone(
-            dt.combine(
-                form.range_end.data,
-                dt.min.time()
-            ),
-            "utc"
-            ).strftime("%Y-%m-%d %H:%M:%S")
-        )
+        if form.range_end.data:
+            range_end = (convert_timezone(
+                dt.combine(
+                    form.range_end.data,
+                    dt.min.time()
+                ),
+                "utc"
+                ).strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
+        else:
+            range_end = (convert_timezone(
+                dt.combine(
+                    form.range_end.data,
+                    dt.max.time()
+                ),
+                "utc"
+                ).strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
         query = {
             "userid": self.userid,
             "range_begin": range_begin,
