@@ -11,24 +11,6 @@
     <fieldset class="form-group">
         <legend>Select a Client and Project then click Start</legend>
         <div class="form-group">
-            {{ form.client.label(class="form-control-label") }}
-            {% if form.client.errors %}
-            <div class="invalid-feedback">
-                {{ form.client(class="form-control form-control-lg is-invalid", list="client_list") }}
-                {% for error in form.client.errors %}
-                    <span> {{ error }}</span>
-                {% endfor %}
-            </div>
-            {% else %}
-                {{ form.client(class="form-control form-control-lg", list="client_list") }}
-            {% endif %}
-            <datalist id="client_list">
-                {% for opt in client_opts %}
-                    <option value={{ entry }}></option>
-                {% endfor %}
-            </datalist>
-        </div>
-        <div class="form-group">
             {{ form.project.label(class="form-control-label") }}
             {% if form.project.errors %}
             <div class="invalid-feedback">
@@ -41,8 +23,44 @@
                 {{ form.project(class="form-control form-control-lg", list="project_list") }}
             {% endif %}
             <datalist id="project_list">
-                {% for opt in project_opts %}
-                    <option value={{ entry }}></option>
+                {% for entry in projects %}
+                    <option value="{{ entry }}"></option>
+                {% endfor %}
+            </datalist>
+        </div>
+        <div class="form-group">
+            {{ form.task.label(class="form-control-label") }}
+            {% if form.task.errors %}
+            <div class="invalid-feedback">
+                {{ form.task(class="form-control form-control-lg is-invalid", list="task_list") }}
+                {% for error in form.task.errors %}
+                    <span> {{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ form.task(class="form-control form-control-lg", list="task_list") }}
+            {% endif %}
+            <datalist id="task_list">
+                {% for entry in tasks %}
+                    <option value="{{ entry }}"></option>
+                {% endfor %}
+            </datalist>
+        </div>
+        <div class="form-group">
+            {{ form.note.label(class="form-control-label") }}
+            {% if form.note.errors %}
+            <div class="invalid-feedback">
+                {{ form.note(class="form-control form-control-lg is-invalid", list="note_list") }}
+                {% for error in form.note.errors %}
+                    <span> {{ error }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+                {{ form.note(class="form-control form-control-lg", list="note_list") }}
+            {% endif %}
+            <datalist id="note_list">
+                {% for entry in notes %}
+                    <option value="{{ entry }}"></option>
                 {% endfor %}
             </datalist>
         </div>
@@ -52,8 +70,5 @@
         <a href={{ url_for( "webtime" ) }} class="btn btn-outline-info">Cancel</a>
     </div>
 </form>
-<p>
-    Or click here to enter new clients/projects: <a href={{ url_for( "new" ) }}>Add New Options</a>
-</p>
 </div>
 {% endblock body %}
