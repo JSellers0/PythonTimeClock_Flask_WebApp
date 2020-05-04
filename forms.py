@@ -30,7 +30,7 @@ class NewForm(FlaskForm):
     new_project = StringField("New Project")
     submit = SubmitField("Submit")
 
-class AdjustTimeForm(FlaskForm):
-    range_begin = DateField("Beginning Date")
+class DateSelectForm(FlaskForm):
+    range_begin = DateField("Starting Date")
     range_end = DateField("Ending Date")
     submit = SubmitField("Submit")
