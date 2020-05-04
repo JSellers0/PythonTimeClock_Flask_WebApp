@@ -88,7 +88,9 @@ def login():
 @login_required
 def start():
     # Get lists for Start page
-    project_list, task_list, note_list = timeclock.get_start_lists()
+    project_list = timeclock.get_list("projects")
+    task_list = timeclock.get_list("tasks")
+    note_list = timeclock.get_list("notes")
 
     form = StartForm()
     if form.validate_on_submit():
@@ -105,37 +107,6 @@ def stop():
     # ToDo: Look up how to pass message to url_for
     return redirect(url_for("webtime"))
 
-# ToDo: Extensively test new creation process and then delete this shit.
-@app.route("/webtime/new", methods=["POST", "GET"])
-@login_required
-def new():
-    form = NewForm()
-    if form.validate_on_submit():
-        if form.new_task.data:
-            resp = requests.post(aws_route+"/tasks", json={"task_name": form.new_task.data})
-            if resp == 201:
-                task_success = True
-            else:
-                task_success = False
-        else:
-            no_task = True
-        if form.new_project.data:
-            resp = requests.post(aws_route+"/projects", json={"project_name": form.new_project.data})
-            if resp == 201:
-                project_success = True
-            else:
-                project_success = False
-        else:
-            no_project = True
-        if (task_success or no_task) and (project_success or no_project):
-            flash("New items successfully added!", "success")
-            return redirect(url_for("start"))
-        elif not task_success:
-            flash("The task name you submitted already exists")
-        elif not project_success:
-            flash("The project name you submitted alread exists.")
-    return render_template("new.html", form=form)
-
 @app.route("/webtime/adjust")
 #@login_required
 def adjust():
@@ -144,28 +115,31 @@ def adjust():
 @app.route("/webtime/adjust/time", methods=["GET", "POST"])
 #@login_required
 def adjust_time():
-    form = AdjustTimeForm()
-    init = True
-    rows=None
+    form = DateSelectForm()
     if form.validate_on_submit():
-        # summary_data = timeclock.get_daterange_rows(form)
-        init = False
-    return render_template("adjust_time.html", form=form, init=init, data=summary_data)
-
-@app.route("/webtime/adjust/task")
-#@login_required
-def adjust_task():
-    return render_template("adjust_task.html")
+        row_list = timeclock.get_daterange_rows(form)
+        return render_template("adjust_itemselect.html", items=row_list, item_type="time")
+    return render_template("adjust_dateselect.html", form=form)
 
 @app.route("/webtime/adjust/project")
 #@login_required
 def adjust_project():
-    return render_template("adjust_project.html")
+    # Get most recent 
+    project_list = timeclock.get_projects()
+    print(project_list)
+    return render_template("adjust_itemselect.html", items=project_list, item_type="projects")
+    
+@app.route("/webtime/adjust/task")
+#@login_required
+def adjust_task():
+    task_list = timeclock.get_tasks()
+    return render_template("adjust_itemselect.html", items=task_list, item_type="tasks")
 
 @app.route("/webtime/adjust/note")
 #@login_required
 def adjust_note():
-    return render_template("adjust_note.html")
+    note_list = timeclock.get_notes()
+    return render_template("adjust_itemselect.html", items=note_list, item_type="notes")
 
 @app.route("/webtime/report")
 #@login_required
