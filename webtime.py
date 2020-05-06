@@ -118,28 +118,25 @@ def adjust_time():
     form = DateSelectForm()
     if form.validate_on_submit():
         row_list = timeclock.get_daterange_rows(form)
-        return render_template("adjust_itemselect.html", items=row_list, item_type="time")
+        if row_list:
+            return render_template("adjust_itemselect.html", items=row_list, item_type="time")
     return render_template("adjust_dateselect.html", form=form)
 
-@app.route("/webtime/adjust/project")
+@app.route("/webtime/adjust/<string:item_type>/")
 #@login_required
-def adjust_project():
-    # Get most recent 
-    project_list = timeclock.get_projects()
-    print(project_list)
-    return render_template("adjust_itemselect.html", items=project_list, item_type="projects")
-    
-@app.route("/webtime/adjust/task")
-#@login_required
-def adjust_task():
-    task_list = timeclock.get_tasks()
-    return render_template("adjust_itemselect.html", items=task_list, item_type="tasks")
+def adjust_itemselect(item_type):
+    if item_type == 'project':
+        item_list = timeclock.get_projects()
+        print(item_list)
+    elif item_type == 'task':
+        item_list = timeclock.get_tasks()
+    elif item_type == 'note':
+        item_list = timeclock.get_notes()
+    return render_template("adjust_itemselect.html", items=item_list, item_type=item_type)
 
-@app.route("/webtime/adjust/note")
-#@login_required
-def adjust_note():
-    note_list = timeclock.get_notes()
-    return render_template("adjust_itemselect.html", items=note_list, item_type="notes")
+@app.route("/webtime/adjust/item/<string:item_type>/<int:id>")
+def adjust_item(item_type, id):
+    return render_template("adjust_item.html", item_type=item_type, id=id)
 
 @app.route("/webtime/report")
 #@login_required
@@ -154,6 +151,7 @@ def users():
 @app.route("/webtime/logout")
 @login_required
 def logout():
+    timeclock.set_userid(0)
     logout_user()
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))
