@@ -223,7 +223,7 @@ class TimeClock():
             return 0
 
     def get_daterange_rows(self, form):
-        range_begin = (convert_timezone(
+        range_begin = (self.convert_timezone(
             dt.combine(
                 form.range_begin.data,
                 dt.min.time()
@@ -232,7 +232,7 @@ class TimeClock():
             ).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         if form.range_end.data:
-            range_end = (convert_timezone(
+            range_end = (self.convert_timezone(
                 dt.combine(
                     form.range_end.data,
                     dt.min.time()
@@ -241,9 +241,9 @@ class TimeClock():
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         else:
-            range_end = (convert_timezone(
+            range_end = (self.convert_timezone(
                 dt.combine(
-                    form.range_end.data,
+                    form.range_begin.data,
                     dt.max.time()
                 ),
                 "utc"
