@@ -25,12 +25,15 @@ class StartForm(FlaskForm):
     
     submit = SubmitField("Start")
 
-class NewForm(FlaskForm):
-    new_client = StringField("New Client")
-    new_project = StringField("New Project")
-    submit = SubmitField("Submit")
-
 class DateSelectForm(FlaskForm):
     range_begin = DateField("Starting Date")
     range_end = DateField("Ending Date")
+    submit = SubmitField("Submit")
+
+class ItemEditForm(FlaskForm):
+    project_name = StringField("Project", validators=[DataRequired()])
+    task_name = StringField("Task", validators=[DataRequired()])
+    note_name = StringField("Note", validators=[DataRequired()])
+    start_time= StringField("Start Time", validators=[DataRequired()])
+    stop_time = StringField("Stop Time")
     submit = SubmitField("Submit")
