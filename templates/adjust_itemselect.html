@@ -2,11 +2,11 @@
 {% block title %}Python WebTime{% endblock %}
 {% block head %}
 {% endblock %}
-{% block page_name %}Edit Notes{% endblock %}
+{% block page_name %}Edit {{ item_type.title() }}s{% endblock %}
 
 {% block body %}
 <div class="content-section">
-    {% if item_type == "times" %}
+    {% if item_type == "time" %}
     <table id="time_table" style="width:100%", class=form-group>
         <tr>
             <th>Timelog ID</th>
@@ -24,11 +24,13 @@
             <td>{{ row.get("note_name") }}</td>
             <td>{{ row.get("start") }}</td>
             <td>{{ row.get("stop") }}</td>
-            <td><button>Update Button</button></td>
+            <td><a  class="btn btn-outline-info"
+                href={{ url_for("adjust_item", item_type="time", id=row.get("timelogid")) }}>Update</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    {% elif item_type == "projects" %}
+    {% elif item_type == "project" %}
     <table id="project_table" style="width:100%", class=form-group>
         <tr>
             <th>Project ID</th>
@@ -38,35 +40,41 @@
         <tr>
             <td>{{ row.get("projectid") }}</td>
             <td>{{ row.get("project_name") }}</td>
-            <td><button>Update Button</button></td>
+            <td><a  class="btn btn-outline-info"
+                href={{ url_for("adjust_item", item_type="project", id=row.get("projectid")) }}>Update</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    {% elif item_type == "tasks" %}
+    {% elif item_type == "task" %}
     <table id="task_table" style="width:100%", class=form-group>
         <tr>
-            <th>Project ID</th>
-            <th>Project Name</th>
+            <th>Task ID</th>
+            <th>Task Name</th>
         </tr>
         {% for row in items %}
         <tr>
             <td>{{ row.get("taskid") }}</td>
             <td>{{ row.get("task_name") }}</td>
-            <td><button>Update Button</button></td>
+            <td><a  class="btn btn-outline-info"
+                href={{ url_for("adjust_item", item_type="task", id=row.get("taskid")) }}>Update</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
-    {% elif item_type == "notes" %}
+    {% elif item_type == "note" %}
     <table id="note_table" style="width:100%", class=form-group>
         <tr>
-            <th>Project ID</th>
-            <th>Project Name</th>
+            <th>Note ID</th>
+            <th>Note Name</th>
         </tr>
         {% for row in items %}
         <tr>
             <td>{{ row.get("noteid") }}</td>
             <td>{{ row.get("note_name") }}</td>
-            <td><button>Update Button</button></td>
+            <td><a  class="btn btn-outline-info"
+                    href={{ url_for("adjust_item" ,item_type="note", id=row.get("noteid")) }}>Update</a>
+            </td>
         </tr>
         {% endfor %}
     </table>
