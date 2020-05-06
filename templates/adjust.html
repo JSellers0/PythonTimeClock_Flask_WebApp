@@ -8,9 +8,9 @@
 <div class="content-section">
     <div id="controlpanel" class="form-group">
         <a class="btn btn-outline-info" href={{ url_for( "adjust_time" ) }} id="adjust_time">Adjust Timestamps</a>
-        <a class="btn btn-outline-info" href={{ url_for( "adjust_project" ) }} id="adjust_project">Edit Projects</a>
-        <a class="btn btn-outline-info" href={{ url_for( "adjust_task" ) }} id="adjust_task">Edit Tasks</a>
-        <a class="btn btn-outline-info" href={{ url_for( "adjust_note" ) }} id="adjust_note">Edit Notes</a>
+        <a class="btn btn-outline-info" href={{ url_for( "adjust_itemselect", item_type="project" ) }} id="adjust_project">Edit Projects</a>
+        <a class="btn btn-outline-info" href={{ url_for( "adjust_itemselect", item_type="task" ) }} id="adjust_task">Edit Tasks</a>
+        <a class="btn btn-outline-info" href={{ url_for( "adjust_itemselect", item_type="note" ) }} id="adjust_note">Edit Notes</a>
         
     </div>
 </div>
