@@ -106,7 +106,6 @@ def stop():
     if not timeclock.stop_timing():
         flash("There was an error stopping the timeclock", "danger")
         return redirect(url_for("webtime"))
-    # ToDo: Look up how to pass message to url_for
     return redirect(url_for("webtime"))
 
 @app.route("/webtime/adjust")
