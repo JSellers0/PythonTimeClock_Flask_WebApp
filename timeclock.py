@@ -4,6 +4,8 @@ import sys
 import requests
 import json
 
+import pandas as pd
+
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil import tz
@@ -69,6 +71,7 @@ class TimeClock():
             "name": form.note.data.lower(),
             "id": timelog.get("noteid")}
         self.start = timelog.get("start")
+        self.stop = 0
         #self.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M")
 
     def register_user(self, form):
@@ -183,7 +186,7 @@ class TimeClock():
             print(tl_resp.status_code)
             if tl_resp.status_code == 201:
                 if self.timelogid:
-                    self.stop_timing(stop_time=timelog.get("start"))
+                    self.stop_timing(stop=timelog.get("start"))
                 self.set_timelog_fields(tl_resp.json(), form)
                 return 1
             else:
@@ -254,12 +257,48 @@ class TimeClock():
             "range_begin": range_begin,
             "range_end": range_end
             }
+        print(query)
         response = requests.get(aws_route+"/timelog/daterange", params=query)
+        print(response)
         if response.status_code == 200:
-            rows = response.json()
+            date_range_rows = json.loads(response.json())
+            print(date_range_rows)
+            self.date_range_rows = date_range_rows["rows"]
+            return date_range_rows["rows"]
         else:
             flash("Error reading rows with dates submitted.", "danger")
             return 0
+
+    def process_daterange_rows(self, daterange_rows):
+        if type(daterange_rows) == int:
+            return 0
+        daterange = pd.DataFrame()
+        print(daterange_rows)
+        for row in daterange_rows:
+            daterange = daterange.append(row, ignore_index=True)
+
+        # preprocess: Convert times; Fill current timelog stop with current time; fill report_date
+        for i, row in daterange.iterrows():
+            daterange.at[i, "report_date"] = (
+                self.convert_timezone(
+                    dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"), 
+                    "local"
+                    ).strftime("%Y-%m-%d")
+            )
+            if row["timelogid"] == str(self.timelogid):
+                daterange.at[i, "hours"] = round((dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600, 2)
+            elif not pd.isna(row["stop"]):
+                daterange.at[i, "hours"] = round((dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600, 2)
+
+        sum_df = daterange[["report_date", "project_name", "task_name", "note_name", "hours"]].groupby(by=[
+            "report_date", "project_name", "task_name", "note_name"]).sum().reset_index()
+
+        sum_row = sum_df[["report_date", "hours"]].groupby("report_date").sum().reset_index()
+        sum_row["project_name"] = "date_total_hours"
+
+        sum_df = sum_df.append(sum_row, ignore_index=True)
+
+        return sum_df
 
     def run(self, db, ui):
         DB = db
