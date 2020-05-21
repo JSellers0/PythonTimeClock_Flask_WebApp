@@ -32,6 +32,9 @@ def load_user(userid):
 # ToDo: Title parameters passed to all render templates
 # ToDo: CSS for Report Result tables
 # ToDo: New option for Project, Task, Note.  I told you not to delete that shit!
+# BUG: Selecting same date for reporting start and end
+# BUG: Selecting 5/6 to 5/7 returns 5/5 date.  Probably timezone conversion shit.
+
 
 @app.route("/webtime", methods=["GET", "PUT"])
 def webtime():
