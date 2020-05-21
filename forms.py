@@ -31,9 +31,9 @@ class DateSelectForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class ItemEditForm(FlaskForm):
-    project_name = StringField("Project", validators=[DataRequired()])
-    task_name = StringField("Task", validators=[DataRequired()])
-    note_name = StringField("Note", validators=[DataRequired()])
-    start_time= StringField("Start Time", validators=[DataRequired()])
-    stop_time = StringField("Stop Time")
+    project = StringField("Project")
+    task = StringField("Task")
+    note = StringField("Note")
+    start = StringField("Start Time")
+    stop = StringField("Stop Time")
     submit = SubmitField("Submit")
