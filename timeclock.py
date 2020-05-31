@@ -82,7 +82,10 @@ class TimeClock():
         }
         resp = requests.post(aws_route+"/users", json=user)
         if resp.status_code == 201:
-            flash("Account created for {}!  Please Log In.", "success")
+            flash("Account created for {}!  Please Log In."
+                .format(form.user_name.data), 
+                "success"
+            )
             return 1
         else:
             return None
