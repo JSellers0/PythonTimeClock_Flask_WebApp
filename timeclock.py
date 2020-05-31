@@ -241,7 +241,7 @@ class TimeClock():
             range_end = (self.convert_timezone(
                 dt.combine(
                     form.range_end.data,
-                    dt.min.time()
+                    dt.max.time()
                 ),
                 "utc"
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
