@@ -1,5 +1,3 @@
-# ToDo: Restructure for Web App
-
 import sys
 import requests
 import json
