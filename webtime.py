@@ -121,19 +121,31 @@ def adjust_itemselect(item_type):
         if form.validate_on_submit():
             row_list = timeclock.get_daterange_rows(form)
             if row_list:
-                print(row_list)
+                for timelog_row in [timelog_row for timelog_row in row_list]:
+                    timelog_row["start"] = (
+                        timeclock.convert_timezone(
+                            dt.strptime(timelog_row.get("start"), "%Y-%m-%dT%H:%M:%SZ"),
+                            "local"
+                        ).strftime("%Y-%m-%d %H:%M")
+                    )
+                    if timelog_row.get("stop"):
+                        timelog_row["stop"] = (
+                            timeclock.convert_timezone(
+                                dt.strptime(timelog_row.get("stop"), "%Y-%m-%dT%H:%M:%SZ"),
+                                "local"
+                            ).strftime("%Y-%m-%d %H:%M")
+                        )
                 return render_template("adjust_itemselect.html", items=row_list, item_type=item_type)
         return render_template("adjust_dateselect.html", form=form)
     if item_type == "project":
         item_list = timeclock.get_projects()
-        print(item_list)
     elif item_type == "task":
         item_list = timeclock.get_tasks()
     elif item_type == "note":
         item_list = timeclock.get_notes()
     return render_template("adjust_itemselect.html", items=item_list, item_type=item_type)
 
-@app.route("/webtime/adjust/item/<string:item_type>/<int:id>")
+@app.route("/webtime/adjust/item/<string:item_type>/<int:id>", methods=["GET", "POST"])
 @login_required
 def adjust_item(item_type, id):
     if item_type == "project":
@@ -144,12 +156,13 @@ def adjust_item(item_type, id):
         item = [note for note in timeclock.get_notes() if note["noteid"] == id][0]
     elif item_type == "time":
         item = [time for time in timeclock.date_range_rows if time["timelogid"] == str(id)][0]
-        item["start"] = timeclock.convert_timezone(dt.strptime(item["start"], "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M:")
-        if item.get("stop"):
-            item["stop"] = timeclock.convert_timezone(dt.strptime(item["stop"], "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M:")
-        else:
+        if not item.get("stop"):
             item["stop"] = "1900-01-01 00:00"
     form = ItemEditForm()
+    if form.validate_on_submit():
+        if timeclock.update_item(form, item_type, id):
+            flash("Item updated successfully!", "success")
+            return redirect(url_for("adjust_itemselect", item_type=item_type))
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
 
 @app.route("/webtime/report", methods=["GET", "POST"])
