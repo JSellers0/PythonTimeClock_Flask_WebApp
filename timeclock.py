@@ -208,7 +208,21 @@ class TimeClock():
                 noteid = self.create_note(form.note.data.lower())
 
             if projectid and taskid and noteid:
-                if form.stop.data.replace(" ", "") not in ("1900-01-01 00:00", ""):
+                
+                if form.stop.data == "1900-01-01 00:00" or form.stop.data.replace(" ", "") == "":
+                    timelog = {
+                            "userid": str(self.userid),
+                            "projectid": str(projectid),
+                            "taskid": str(taskid),
+                            "noteid": str(noteid),
+                            "start": self.convert_timezone(
+                                dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
+                                "utc"
+                            ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            "stop": "na"
+                        }
+                    
+                else:
                     timelog = {
                             "userid": str(self.userid),
                             "projectid": str(projectid),
@@ -223,21 +237,14 @@ class TimeClock():
                                 "utc"
                             ).strftime("%Y-%m-%dT%H:%M:%SZ")
                         }
-                else:
-                    timelog = {
-                            "userid": str(self.userid),
-                            "projectid": str(projectid),
-                            "taskid": str(taskid),
-                            "noteid": str(noteid),
-                            "start": self.convert_timezone(
-                                dt.strptime(form.stop.data, "%Y-%m-%d %H:%M"),
-                                "utc"
-                            ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            "stop": "na"
-                        }
-                
+                    
                 response = requests.put(aws_route + "/timelog/" + str(id), json=timelog)
                 if response.status_code == 200:
+                    if id == self.timelogid:
+                        self.start = self.convert_timezone(
+                                dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
+                                "utc"
+                            ).strftime("%Y-%m-%dT%H:%M:%SZ")
                     return 1
                 else:
                     flash("Error Updating Timelog Row", "danger")
