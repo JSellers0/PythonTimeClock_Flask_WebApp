@@ -90,7 +90,8 @@ def start():
     if form.validate_on_submit():
         if timeclock.start_timing(form):
             return redirect(url_for("webtime"))
-    return render_template("start.html", form=form, projects=project_list, tasks=task_list, notes=note_list)
+    return render_template("start.html", title="Start Timing", form=form, 
+        projects=project_list, tasks=task_list, notes=note_list)
 
 @app.route("/webtime/stop", methods=["GET", "PUT"])
 @login_required
@@ -117,14 +118,14 @@ def adjust_itemselect(item_type):
                     timelog_row["start"] = (
                         timeclock.convert_timezone(
                             dt.strptime(timelog_row.get("start"), "%Y-%m-%dT%H:%M:%SZ"),
-                            "local"
+                            current_user.timezone
                         ).strftime("%Y-%m-%d %H:%M")
                     )
                     if timelog_row.get("stop"):
                         timelog_row["stop"] = (
                             timeclock.convert_timezone(
                                 dt.strptime(timelog_row.get("stop"), "%Y-%m-%dT%H:%M:%SZ"),
-                                "local"
+                                current_user.timezone
                             ).strftime("%Y-%m-%d %H:%M")
                         )
                 return render_template("adjust_itemselect.html", items=row_list, item_type=item_type)
@@ -162,7 +163,7 @@ def adjust_item(item_type, id):
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
-        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form))
+        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form), current_user.timezone)
         if type(report_data) != int:
             return render_template("report_result.html", title="Report Result", report_data=report_data)
         else:
