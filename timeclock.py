@@ -357,7 +357,7 @@ class TimeClock():
             flash("Error reading rows with dates submitted.", "danger")
             return 0
 
-    def process_daterange_rows(self, daterange_rows):
+    def process_daterange_rows(self, daterange_rows, timezone):
         if type(daterange_rows) == int:
             return 0
         daterange = pd.DataFrame()
@@ -369,7 +369,7 @@ class TimeClock():
             daterange.at[i, "report_date"] = (
                 self.convert_timezone(
                     dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"), 
-                    "local"
+                    timezone
                     ).strftime("%Y-%m-%d")
             )
             if row["timelogid"] == str(self.timelogid):
@@ -387,3 +387,4 @@ class TimeClock():
 
         return sum_df
 
+    
