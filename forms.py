@@ -12,6 +12,7 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     user_name = StringField("Username", validators=[DataRequired(), Length(max=40)])
     email = StringField("Email", validators=[DataRequired(), Email()])
+    timezone = SelectField("Local Timezone", choices=["US/Eastern"], validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm Password",
                                     validators=[DataRequired(), EqualTo("password")])
