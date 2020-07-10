@@ -32,15 +32,12 @@ class TimeClock():
                 .astimezone(tz.tzutc())
             )
 
-        elif to == "local":
+        else:
             return (
                 my_time
-                .replace(tzinfo=tz.tzutc())
+                .replace(tzinfo=tz.gettz(to))
                 .astimezone(tz.tzlocal())
             )
-
-        else:
-            return None
 
     def reset_timelog_fields(self):
         """ Reset timelog fields to default no value"""
@@ -366,12 +363,13 @@ class TimeClock():
 
         # preprocess: Convert times; Fill current timelog stop with current time; fill report_date
         for i, row in daterange.iterrows():
-            daterange.at[i, "report_date"] = (
-                self.convert_timezone(
-                    dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"), 
-                    timezone
-                    ).strftime("%Y-%m-%d")
-            )
+            if row.get("start"):
+                daterange.at[i, "report_date"] = (
+                    self.convert_timezone(
+                        dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"), 
+                        timezone
+                        ).strftime("%Y-%m-%d")
+                )   
             if row["timelogid"] == str(self.timelogid):
                 daterange.at[i, "hours"] = round((dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600, 2)
             elif not pd.isna(row["stop"]):
