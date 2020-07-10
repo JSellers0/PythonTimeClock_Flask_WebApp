@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SelectField, SubmitField, BooleanField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import (DataRequired, Length, Email, EqualTo, ValidationError)
 
@@ -10,9 +10,14 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 class RegisterForm(FlaskForm):
+    tzs = [
+        ("US/Eastern", "US/Eastern"),
+        ("US/Central", "US/Central"),
+        ("US/Pacific", "US/Pacific")
+        ]
     user_name = StringField("Username", validators=[DataRequired(), Length(max=40)])
     email = StringField("Email", validators=[DataRequired(), Email()])
-    timezone = SelectField("Local Timezone", choices=["US/Eastern"], validators=[DataRequired()])
+    timezone = SelectField("Local Timezone", choices=tzs, validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm Password",
                                     validators=[DataRequired(), EqualTo("password")])
