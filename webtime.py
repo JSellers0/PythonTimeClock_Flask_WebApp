@@ -173,7 +173,8 @@ def report():
 @app.route("/users")
 @login_required
 def users():
-    return render_template("users.html")
+    form = UserForm()
+    return render_template("users.html", user=current_user, form=form)
 
 @app.route("/webtime/logout")
 @login_required

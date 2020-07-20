@@ -43,3 +43,14 @@ class ItemEditForm(FlaskForm):
     start = StringField("Start Time")
     stop = StringField("Stop Time")
     submit = SubmitField("Submit")
+
+class UserForm(FlaskForm):
+    tzs = [
+        ("US/Eastern", "US/Eastern"),
+        ("US/Central", "US/Central"),
+        ("US/Pacific", "US/Pacific")
+        ]
+    user_name = StringField("Username", validators=[DataRequired(), Length(max=40)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    timezone = SelectField("Local Timezone", choices=tzs, validators=[DataRequired()])
+    update = SubmitField("Update")
