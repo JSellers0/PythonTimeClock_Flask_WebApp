@@ -28,7 +28,6 @@ class StartForm(FlaskForm):
     project = StringField("Project", validators=[DataRequired()])
     task = StringField("Task", validators=[DataRequired()])
     note = StringField("Note", validators=[DataRequired()])
-    
     submit = SubmitField("Start")
 
 class DateSelectForm(FlaskForm):
@@ -42,6 +41,7 @@ class ItemEditForm(FlaskForm):
     note = StringField("Note")
     start = StringField("Start Time")
     stop = StringField("Stop Time")
+    adjacent = BooleanField("Update adjacent timestamp rows.", default=True)
     submit = SubmitField("Submit")
 
 class UserForm(FlaskForm):

@@ -49,6 +49,14 @@
             {{ form.note.label(class="form-control-label") }}
             {{ form.note(class="form-control form-control-lg", value=item.get("note_name")) }}
         </div>
+        <div class="form-group"
+        {% if item_type not in ["time"] %}
+        style="display:none"
+        {% endif %}
+        >
+            {{ form.adjacent() }}
+            {{ form.adjacent.label() }}
+        </div>
     </fieldset>
     <div class="form-group">
         {{ form.submit(class="btn btn-outline-info") }}
