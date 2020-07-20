@@ -370,16 +370,20 @@ class TimeClock():
                     ).strftime("%Y-%m-%d")
             )   
             if row["timelogid"] == str(self.timelogid):
-                daterange.at[i, "hours"] = round((dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600, 2)
+                daterange.at[i, "hours"] = (dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
             elif not pd.isna(row["stop"]):
-                daterange.at[i, "hours"] = round((dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600, 2)
+                daterange.at[i, "hours"] = (dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
 
+        # Sum rows by date-project-task-note
         sum_df = daterange[["report_date", "project_name", "task_name", "note_name", "hours"]].groupby(by=[
             "report_date", "project_name", "task_name", "note_name"]).sum().reset_index()
 
+        # Round hours
+        sum_df["hours"] = sum_df["hours"].apply(lambda x: round(x, 1))
+
+        # Sum hours by day and add to sum_df
         sum_row = sum_df[["report_date", "hours"]].groupby("report_date").sum().reset_index()
         sum_row["project_name"] = "date_total_hours"
-
         sum_df = sum_df.append(sum_row, ignore_index=True)
 
         return sum_df
