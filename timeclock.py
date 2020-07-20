@@ -35,8 +35,8 @@ class TimeClock():
         else:
             return (
                 my_time
-                .replace(tzinfo=tz.gettz(to))
-                .astimezone(tz.tzlocal())
+                .replace(tzinfo=tz.tzutc())
+                .astimezone(tz.tz.gettz(to))
             )
 
     def reset_timelog_fields(self):
