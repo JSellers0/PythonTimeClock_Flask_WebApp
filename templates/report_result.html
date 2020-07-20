@@ -10,12 +10,12 @@
     {% for r_date in report_data["report_date"].unique().tolist() %}
         {% set day_data = report_data.loc[report_data["report_date"] == r_date] %}
         <div class="report-header">
-            <span class="report-date">{{ r_date }}</span>
-            <span class="total-hours-label">Total Hours</span>
-            <span class="total-hours">{{ day_data.loc[day_data["project_name"] == "date_total_hours"].iloc[0]["hours"] }}</span>
+            <span class="date">{{ r_date }}</span>
+            <span class="label">Total Hours</span>
+            <span class="value">{{ day_data.loc[day_data["project_name"] == "date_total_hours"].iloc[0]["hours"] }}</span>
         </div>
         <table class="report-table">
-            <tr>
+            <tr class="report-row-header">
                 <th>Project</th>
                 <th>Task</th>
                 <th>Note</th>
@@ -23,16 +23,16 @@
             </tr>
         {% for i, report_row in day_data.loc[day_data["project_name"] != "date_total_hours"].iterrows() %}
             <tr>
-                <td>{{ report_row["project_name"] }}</td>
-                <td>{{ report_row["task_name"] }}</td>
-                <td>{{ report_row["note_name"] }}</td>
-                <td>{{ report_row["hours"] }}</td>
+                <td class="cell_name">{{ report_row["project_name"] }}</td>
+                <td class="cell_name">{{ report_row["task_name"] }}</td>
+                <td class="cell_name">{{ report_row["note_name"] }}</td>
+                <td class="cell_hours">{{ report_row["hours"] }}</td>
             </tr>
         {% endfor %}
         </table>
     {% endfor %}
     <br/>
-    <a class="btn btn-outline-info" href={{ url_for("report") }}>New Date</a>
+    <a class="btn btn-outline-info" href={{ url_for("report") }}>New Dates</a>
 </div>
 <p>
     <a href={{ url_for( "webtime" ) }}>Back to Main Menu</a>
