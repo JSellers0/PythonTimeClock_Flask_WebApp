@@ -1,55 +1,42 @@
 {% extends "parent.html" %}
-{% block title %}Reporting{% endblock %}
 {% block head %}
 {% endblock %}
-{% block page_name %}Testing It Out{% endblock %}
+{% block page_name %}Account Information{% endblock %}
 
 {% block body %}
-    <div class="container">
-        <input id="url_user_id" type="hidden" value="{{ userid }}" />
-        <div class="section editor">
-            <div>
-                <span>UserID:</span>
-                <span id="userid"></span>
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend>You may change your Username and email address here.</legend>
+            <div class="form-group">
+                {{ form.user_name.label(class="form-control-label") }}
+                {{ form.user_name(value=user.user_name,
+                                class="form-control form-control-lg") }}
             </div>
-            <label for="user_name">Username
-                <input id="user_name" type="text" autocomplete="off" />
-            </label>
-            <br />
-            <label for="email">Email Address
-                <input id="email" type="text" autocomplete="off" />
-            </label>
-            <br />
-            <button id="create">Create</button>
-            <button id="update">Update</button>
-            <button id="reset">Reset</button>
+            <div class="form-group">
+                {{ form.email.label(class="form-control-label") }}
+                {{ form.email(value=user.email,
+                            class="form-control form-control-lg") }}
+            </div>
+            <div class="form-group">
+                {{ form.timezone.label(class="form-control-label") }}
+                {{ form.timezone(value=user.timezone,
+                            class="form-control form-control-lg") }}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.update(class="btn btn-outline-info") }}
         </div>
-        <div class="users">
-            <table>
-                <caption>Users</caption>
-                <thead>
-                    <tr>
-                        <th>User_name</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-        <div class="error">
+    </form>
+</div>
+<p>
+    <a href={{ url_for( "webtime" ) }}>Back to Main Menu</a>
+</p>
 
-        </div>
-    </div>
-    <div class="error">
-    </div>
+<p>
+    Having issues with the app?
+    <a href="https://github.com/JSellers0/PythonTimeClock_Flask_WebApp/issues">
+        Please submit them here.</a>
+</p>
 {% endblock body %}
-
-{% block javascript %}
-{{ super() }}
-<script type="module">
-    // Give the imported MVC components a namespace
-    import * as MVC from "/static/js/users.js";
-
-    // Create an inentional global variable referencing the import
-    window.mvc = MVC;
-</script>
-{% endblock %}
