@@ -98,6 +98,13 @@ class TimeClock():
             flash("User Not Recognized.  Please check your info or Register an Account!", "danger")
             return None
     
+    def get_timerow(self, id):
+        response = requests.get(aws_route+"/timelog/{id}".format(id=str(id)))
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+    
     def get_projects(self):
         response = requests.get(aws_route + "/projects")
         if response.status_code == 200:
@@ -217,8 +224,7 @@ class TimeClock():
                                 "utc"
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": "na"
-                        }
-                    
+                        }                   
                 else:
                     timelog = {
                             "userid": str(self.userid),
@@ -234,9 +240,20 @@ class TimeClock():
                                 "utc"
                             ).strftime("%Y-%m-%dT%H:%M:%SZ")
                         }
+
+                old_timelog = self.get_timerow(id)
                     
                 response = requests.put(aws_route + "/timelog/" + str(id), json=timelog)
                 if response.status_code == 200:
+                    if form.adjacent.data == True:
+                        if old_timelog:
+                            # Need to build search for timelog row by userid + start or stop time
+                            # if start match, update with form.stop.data
+                            # if stop match, update with form.start.data
+                            pass
+                        else:
+                            flash("Error getting timelog row for adjacent check.", "danger")
+
                     if id == self.timelogid:
                         self.start = self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),

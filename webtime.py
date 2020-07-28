@@ -149,8 +149,6 @@ def adjust_item(item_type, id):
         item = [note for note in timeclock.get_notes() if note["noteid"] == id][0]
     elif item_type == "time":
         item = [time for time in timeclock.date_range_rows if time["timelogid"] == str(id)][0]
-        if not item.get("stop"):
-            item["stop"] = "1900-01-01 00:00"
     form = ItemEditForm()
     if form.validate_on_submit():
         if timeclock.update_item(form, item_type, id):
