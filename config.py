@@ -1,1 +1,1 @@
-aws_route = "http://ec2-54-165-200-187.compute-1.amazonaws.com/api"
+aws_route = "http://localhost:5001/api"
