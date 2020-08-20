@@ -1,5 +1,3 @@
-import requests
-
 from dateutil import tz
 from datetime import datetime as dt
 
