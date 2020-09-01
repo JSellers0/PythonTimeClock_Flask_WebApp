@@ -4,8 +4,6 @@ from datetime import datetime as dt
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 
-from flask_bcrypt import Bcrypt
-
 from forms import *
 from models import UserManager
 
