@@ -179,6 +179,3 @@ def logout():
     logout_user()
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))
-
-if __name__ == "__main__":
-    app.run(debug=True)
