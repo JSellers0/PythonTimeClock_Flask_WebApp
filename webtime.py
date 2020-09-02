@@ -27,7 +27,7 @@ timeclock = TimeClock()
 def load_user(userid):
     return user_manager.get_user(userid)
 
-@app.route("/webtime", methods=["GET", "PUT"])
+@app.route("/", methods=["GET", "PUT"])
 def webtime():
     message = "Click Start to start timing!"
     if timeclock.stop:
@@ -51,7 +51,7 @@ def webtime():
         )
     return render_template("webtime.html", title="PythonTimeClock", message=message)
 
-@app.route("/webtime/register", methods=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("webtime"))
@@ -61,7 +61,7 @@ def register():
             return redirect(url_for("login"))
     return render_template("register.html", title="Registration", form=form)
 
-@app.route("/webtime/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("users"))
@@ -76,7 +76,7 @@ def login():
 
     return render_template("login.html", title="Login", form=form)
 
-@app.route("/webtime/start", methods=["POST", "GET"])
+@app.route("/start", methods=["POST", "GET"])
 @login_required
 def start():
     # Get lists for Start page
@@ -91,7 +91,7 @@ def start():
     return render_template("start.html", title="Start Timing", form=form, 
         projects=project_list, tasks=task_list, notes=note_list)
 
-@app.route("/webtime/stop", methods=["GET", "PUT"])
+@app.route("/stop", methods=["GET", "PUT"])
 @login_required
 def stop():
     if not timeclock.stop_timing():
@@ -99,12 +99,12 @@ def stop():
         return redirect(url_for("webtime"))
     return redirect(url_for("webtime"))
 
-@app.route("/webtime/adjust")
+@app.route("/adjust")
 @login_required
 def adjust():
     return render_template("adjust.html")
 
-@app.route("/webtime/adjust/<string:item_type>/", methods=["GET", "POST"])
+@app.route("/adjust/<string:item_type>/", methods=["GET", "POST"])
 @login_required
 def adjust_itemselect(item_type):
     if item_type == "time":
@@ -136,7 +136,7 @@ def adjust_itemselect(item_type):
         item_list = timeclock.get_notes()
     return render_template("adjust_itemselect.html", items=item_list, item_type=item_type)
 
-@app.route("/webtime/adjust/item/<string:item_type>/<int:id>", methods=["GET", "POST"])
+@app.route("/adjust/item/<string:item_type>/<int:id>", methods=["GET", "POST"])
 @login_required
 def adjust_item(item_type, id):
     if item_type == "project":
@@ -154,7 +154,7 @@ def adjust_item(item_type, id):
             return redirect(url_for("adjust_itemselect", item_type=item_type))
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
 
-@app.route("/webtime/report", methods=["GET", "POST"])
+@app.route("/report", methods=["GET", "POST"])
 @login_required
 def report():
     form = DateSelectForm()
@@ -172,7 +172,7 @@ def users():
     form = UserForm()
     return render_template("users.html", user=current_user, form=form)
 
-@app.route("/webtime/logout")
+@app.route("/logout")
 @login_required
 def logout():
     timeclock.set_userid(0)
