@@ -1,1 +1,1 @@
-aws_route = "http://localhost:5001/api"
+aws_route = "http://192.168.0.202/api/clock"
