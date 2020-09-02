@@ -73,7 +73,7 @@ class TimeClock():
         user = {
             "user_name": form.user_name.data,
             "email" : form.email.data,
-            "password": form.password.data
+            "encoded_password": form.password.data
         }
         resp = requests.post(aws_route+"/users", json=user)
         if resp.status_code == 201:
