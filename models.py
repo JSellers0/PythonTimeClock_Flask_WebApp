@@ -14,15 +14,11 @@ class UserManager():
         self.users[userid] = user
 
 
-class MyUser(UserMixin):
+class MyUser():
     def __init__(self, user):
         self.userid = user.get("userid")
         self.user_name = user.get("user_name")
         self.email = user.get("email")
         self.timezone = user.get("timezone")
-        
-    @property
-    def id(self):
-        return self
 
 

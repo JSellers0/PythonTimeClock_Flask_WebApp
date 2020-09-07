@@ -92,11 +92,7 @@ class TimeClock():
             }
         response = requests.post(aws_route + "/users/name", json=user)
         if response.status_code == 200:
-            new_user = MyUser()
-            new_user.id = response.json().get("userid")
-            new_user.user_name = response.json().get("user_name")
-            new_user.email = response.json().get("email")
-            new_user.timezone = response.json().get("timezone")
+            new_user = MyUser(response.json())
             return new_user
 
         else:
