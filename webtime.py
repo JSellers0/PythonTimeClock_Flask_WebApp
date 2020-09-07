@@ -53,6 +53,7 @@ def webtime():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    print(user_manager.get_user(session["email"]))
     if user_manager.get_user(session["email"]):
         return redirect(url_for("webtime"))
     form = RegisterForm()
