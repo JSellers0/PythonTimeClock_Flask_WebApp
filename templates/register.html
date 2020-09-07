@@ -4,6 +4,11 @@
 {% block page_name %}Register for TimeClock Account{% endblock %}
 
 {% block body %}
+
+{{ session["email"] }}
+{{ um.get_user("test2") }}
+{{ um.get_user(session["email"]) }}
+
 <div class="content-section">
     <form method="POST" action="">
         {{ form.hidden_tag() }}

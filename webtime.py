@@ -53,14 +53,13 @@ def webtime():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    print(user_manager.get_user(session["email"]))
     if user_manager.get_user(session["email"]):
         return redirect(url_for("webtime"))
     form = RegisterForm()
     if form.validate_on_submit():
         if timeclock.register_user(form):
             return redirect(url_for("login"))
-    return render_template("register.html", title="Registration", form=form)
+    return render_template("register.html", title="Registration", form=form, um=user_manager)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
