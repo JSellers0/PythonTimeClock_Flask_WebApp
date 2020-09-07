@@ -41,7 +41,7 @@
                 {% endif %}
             {% endwith %}
             {{ request.headers.get("Authorization") }}
-            {{ session }}
+            {{ session["Sellerman"] }}
         {% block body %}
         {% endblock %}
     </main>
