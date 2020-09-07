@@ -53,7 +53,7 @@ def webtime():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if current_user.is_authenticated:
+    if user_manager.get_user(session["email"]):
         return redirect(url_for("webtime"))
     form = RegisterForm()
     if form.validate_on_submit():
@@ -70,7 +70,7 @@ def login():
         new_user = timeclock.login_user(form)
         if new_user:
             user_manager.add_user(new_user.user_name, new_user)
-            session[new_user.user_name] = new_user.email
+            session["email"] = new_user.email
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
 

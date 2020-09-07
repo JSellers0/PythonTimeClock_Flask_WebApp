@@ -4,14 +4,14 @@ class UserManager():
     def __init__(self):
         self.users = {}
 
-    def get_user(self, userid):
+    def get_user(self, email):
         try:
-            return self.users[userid]
+            return self.users[email]
         except KeyError:
             return None
 
-    def add_user(self, userid, user):
-        self.users[userid] = user
+    def add_user(self, email, user):
+        self.users[email] = user
 
 
 class MyUser():
