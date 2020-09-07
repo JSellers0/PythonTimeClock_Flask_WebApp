@@ -36,11 +36,11 @@
                     {% for category, message in messages %}
                         <div class="alert alert-{{ category }}">
                             {{ message }}
-                            {{ request.headers.get("Authorization") }}
                         </div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+            {{ request.headers.get("Authorization") }}
         {% block body %}
         {% endblock %}
     </main>
