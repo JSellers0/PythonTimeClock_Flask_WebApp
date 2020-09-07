@@ -7,7 +7,7 @@ from flask_login import LoginManager, login_required, current_user, logout_user,
 from flask_bcrypt import Bcrypt
 
 from forms import *
-from models import UserManager
+from models import MyUser, UserManager
 
 from timeclock import TimeClock
 
@@ -67,10 +67,9 @@ def login():
         return redirect(url_for("users"))
     form = LoginForm()
     if form.validate_on_submit():
-        cur_user = timeclock.login_user(form)
-        if cur_user:
+        if timeclock.login_user(form):
             user_manager.add_user(cur_user.get_id(), cur_user)
-            login_user(cur_user, remember=form.remember.data)
+            login_user(cur_user, remember=False)
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
 
