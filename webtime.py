@@ -67,17 +67,16 @@ def login():
         return redirect(url_for("users"))
     form = LoginForm()
     if form.validate_on_submit():
-        cur_user = timeclock.login_user(form)
-        if cur_user:
-            user_manager.add_user(cur_user.get_id(), cur_user)
-            login_user(cur_user, remember=form.remember.data)
+        new_user = timeclock.login_user(form)
+        if new_user:
+            user_manager.add_user(new_user.user_name, new_user)
+            session[new_user.username] = new_user.email
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
 
     return render_template("login.html", title="Login", form=form)
 
 @app.route("/start", methods=["POST", "GET"])
-@login_required
 def start():
     # Get lists for Start page
     project_list = timeclock.get_list("projects")
@@ -92,7 +91,6 @@ def start():
         projects=project_list, tasks=task_list, notes=note_list)
 
 @app.route("/stop", methods=["GET", "PUT"])
-@login_required
 def stop():
     if not timeclock.stop_timing():
         flash("There was an error stopping the timeclock", "danger")
@@ -100,12 +98,10 @@ def stop():
     return redirect(url_for("webtime"))
 
 @app.route("/adjust")
-@login_required
 def adjust():
     return render_template("adjust.html")
 
 @app.route("/adjust/<string:item_type>/", methods=["GET", "POST"])
-@login_required
 def adjust_itemselect(item_type):
     if item_type == "time":
         form = DateSelectForm()
@@ -137,7 +133,6 @@ def adjust_itemselect(item_type):
     return render_template("adjust_itemselect.html", items=item_list, item_type=item_type)
 
 @app.route("/adjust/item/<string:item_type>/<int:id>", methods=["GET", "POST"])
-@login_required
 def adjust_item(item_type, id):
     if item_type == "project":
         item = [project for project in timeclock.get_projects() if project["projectid"] == id][0]
@@ -155,7 +150,6 @@ def adjust_item(item_type, id):
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
 
 @app.route("/report", methods=["GET", "POST"])
-@login_required
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
@@ -167,13 +161,11 @@ def report():
     return render_template("report.html", title="Report Date Selection", form=form)
 
 @app.route("/users")
-@login_required
 def users():
     form = UserForm()
     return render_template("users.html", user=current_user, form=form)
 
 @app.route("/logout")
-@login_required
 def logout():
     timeclock.set_userid(0)
     logout_user()

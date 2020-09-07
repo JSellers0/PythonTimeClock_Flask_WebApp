@@ -92,8 +92,13 @@ class TimeClock():
             }
         response = requests.post(aws_route + "/users/name", json=user)
         if response.status_code == 200:
-            self.set_userid(response.json()["userid"])
-            return MyUser(response.json())
+            new_user = MyUser()
+            new_user.id = response.json().get("userid")
+            new_user.user_name = response.json().get("user_name")
+            new_user.email = response.json().get("email")
+            new_user.timezone = response.json().get("timezone")
+            return new_user
+
         else:
             flash("User Not Recognized.  Please check your info or Register an Account!", "danger")
             return None
