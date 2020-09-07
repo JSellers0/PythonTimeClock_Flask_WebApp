@@ -40,7 +40,6 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            {{ request.headers.get("Authorization") }}
             {{ session["Sellerman"] }}
         {% block body %}
         {% endblock %}
