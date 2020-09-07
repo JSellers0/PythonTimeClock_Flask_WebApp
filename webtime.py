@@ -1,7 +1,7 @@
 from dateutil import tz
 from datetime import datetime as dt
 
-from flask import Flask, render_template, url_for, redirect, request, flash
+from flask import Flask, render_template, url_for, redirect, request, flash, session
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 
 from flask_bcrypt import Bcrypt
@@ -26,6 +26,11 @@ timeclock = TimeClock()
 @login_manager.user_loader
 def load_user(userid):
     return user_manager.get_user(userid)
+
+@app.before_request
+def before_request():
+    session.permanent = True
+
 
 @app.route("/", methods=["GET", "PUT"])
 def webtime():

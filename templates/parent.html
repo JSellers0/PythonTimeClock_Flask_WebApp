@@ -41,6 +41,7 @@
                 {% endif %}
             {% endwith %}
             {{ request.headers.get("Authorization") }}
+            {{ session.permanent_session_lifetime }}
         {% block body %}
         {% endblock %}
     </main>
