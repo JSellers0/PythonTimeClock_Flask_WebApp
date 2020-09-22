@@ -18,7 +18,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarToggle">
                 <div class="navbar-nav mr-auto">
-                    {% if current_user.is_authenticated %}
+                    {% session.get("user_token") %}
                         <a class="nav-item nav-link" href={{ url_for( "users" ) }}>Account</a>
                         <a class="nav-item nav-link" href={{ url_for( "logout" ) }}>Logout</a>
                     {% else %}
