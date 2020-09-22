@@ -5,7 +5,7 @@
 
 {% block body %}
 <div class="content-section">
-    {% if current_user.is_authenticated %}
+    {% if session.get("user_token") %}
     <div>
         {% if "Click" in message %}
             <h1 id="message">{{ message }}</h1>
