@@ -4,8 +4,6 @@ from datetime import datetime as dt
 from flask import Flask, render_template, url_for, redirect, request, flash, session
 from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 
-from flask_bcrypt import Bcrypt
-
 from forms import *
 from models import UserManager
 
@@ -14,18 +12,7 @@ from timeclock import TimeClock
 app = Flask(__name__)
 app.secret_key = b';aeirja_)(_9u-a9jdfae90ej-e09!@aldjfa;'
 
-login_manager = LoginManager()
-login_manager.login_view = "login"
-login_manager.login_message_category = "danger"
-login_manager.init_app(app)
-
-user_manager = UserManager()
-
 timeclock = TimeClock()
-
-@login_manager.user_loader
-def load_user(userid):
-    return user_manager.get_user(userid)
 
 @app.route("/", methods=["GET", "PUT"])
 def webtime():
@@ -53,7 +40,7 @@ def webtime():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if user_manager.get_user(session["email"]):
+    if session.get("user_token"):
         return redirect(url_for("webtime"))
     form = RegisterForm()
     if form.validate_on_submit():
@@ -63,14 +50,13 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated:
+    if session.get("user_token"):
         return redirect(url_for("users"))
     form = LoginForm()
     if form.validate_on_submit():
         new_user = timeclock.login_user(form)
         if new_user:
-            user_manager.add_user(new_user.user_name, new_user)
-            session["email"] = new_user.email
+            session["user_token"] = new_user.get("user_token")
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
 
@@ -167,7 +153,5 @@ def users():
 
 @app.route("/logout")
 def logout():
-    timeclock.set_userid(0)
-    logout_user()
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))

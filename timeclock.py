@@ -7,10 +7,8 @@ import pandas as pd
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil import tz
-
+from itsdangerous import Serializer
 from flask import flash
-
-from models import MyUser
 
 from config import aws_route
 
@@ -70,10 +68,12 @@ class TimeClock():
         #self.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M")
 
     def register_user(self, form):
+        s = Serializer("16bOEuoyrWn1DxiIXWVsG9")
         user = {
             "user_name": form.user_name.data,
             "email" : form.email.data,
-            "encoded_password": form.password.data
+            "user_token": s.dumps([form.user_name.data, form.password.data]),
+            "timezone": form.timezone.data
         }
         resp = requests.post(aws_route+"/users", json=user)
         if resp.status_code == 201:
@@ -92,7 +92,7 @@ class TimeClock():
             }
         response = requests.post(aws_route + "/users/name", json=user)
         if response.status_code == 200:
-            new_user = MyUser(response.json())
+            new_user = response.json()
             return new_user
 
         else:
