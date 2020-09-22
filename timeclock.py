@@ -76,7 +76,7 @@ class TimeClock():
             "user_token": s.dumps([form.user_name.data, form.password.data]),
             "timezone": form.timezone.data
         }
-        resp = requests.post(aws_route+"/users", json=user)
+        resp = requests.post(aws_route + "/users", json=user)
         if resp.status_code == 201:
             flash("Account created for {}!  Please Log In."
                 .format(form.user_name.data), 
@@ -84,6 +84,7 @@ class TimeClock():
             )
             return 1
         else:
+            # ToDo: Add more responses for errors.
             return None
 
     def get_user_by_token(self, token):
@@ -94,20 +95,16 @@ class TimeClock():
             return response.json()
     
     def login_user(self, form):
-        user = {
-            "user_name": form.user_name.data,
-            "password" : form.password.data
-            }
-        response = requests.post(aws_route + "/users/name", json=user)
+        user = {"user_token": s.dumps([form.user_name.data, form.password.data])}
+        response = requests.post(aws_route + "/users/token", json=user)
         if response.status_code == 200:
             return response.json()
-
         else:
             flash("User Not Recognized.  Please check your info or Register an Account!", "danger")
             return None
     
     def get_timerow(self, id):
-        response = requests.get(aws_route+"/timelog/{id}".format(id=str(id)))
+        response = requests.get(aws_route + "/timelog/{id}".format(id=str(id)))
         if response.status_code == 200:
             return response.json()
         else:
