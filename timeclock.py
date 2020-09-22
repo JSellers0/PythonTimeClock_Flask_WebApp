@@ -12,6 +12,8 @@ from flask import flash
 
 from config import aws_route
 
+s = Serializer("16bOEuoyrWn1DxiIXWVsG9")
+
 class TimeClock():
     def __init__(self):
         self.userid = None
@@ -68,7 +70,6 @@ class TimeClock():
         #self.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M")
 
     def register_user(self, form):
-        s = Serializer("16bOEuoyrWn1DxiIXWVsG9")
         user = {
             "user_name": form.user_name.data,
             "email" : form.email.data,
@@ -84,6 +85,13 @@ class TimeClock():
             return 1
         else:
             return None
+
+    def get_user_by_token(self, token):
+        user = {"user_token": token}
+
+        response = requests.post(aws_route + "/users/token", json=user)
+        if response.status_code == 200:
+            return response.json()
     
     def login_user(self, form):
         user = {
@@ -92,8 +100,7 @@ class TimeClock():
             }
         response = requests.post(aws_route + "/users/name", json=user)
         if response.status_code == 200:
-            new_user = response.json()
-            return new_user
+            return response.json()
 
         else:
             flash("User Not Recognized.  Please check your info or Register an Account!", "danger")

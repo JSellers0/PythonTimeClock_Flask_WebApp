@@ -2,7 +2,6 @@ from dateutil import tz
 from datetime import datetime as dt
 
 from flask import Flask, render_template, url_for, redirect, request, flash, session
-from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 
 from forms import *
 from models import UserManager
@@ -46,7 +45,7 @@ def register():
     if form.validate_on_submit():
         if timeclock.register_user(form):
             return redirect(url_for("login"))
-    return render_template("register.html", title="Registration", form=form, um=user_manager)
+    return render_template("register.html", title="Registration", form=form)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -57,6 +56,7 @@ def login():
         new_user = timeclock.login_user(form)
         if new_user:
             session["user_token"] = new_user.get("user_token")
+            session["timezone"] = new_user.get("timezone")
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
 
@@ -98,14 +98,14 @@ def adjust_itemselect(item_type):
                     timelog_row["start"] = (
                         timeclock.convert_timezone(
                             dt.strptime(timelog_row.get("start"), "%Y-%m-%dT%H:%M:%SZ"),
-                            current_user.timezone
+                            session.get("timezone")
                         ).strftime("%Y-%m-%d %H:%M")
                     )
                     if timelog_row.get("stop"):
                         timelog_row["stop"] = (
                             timeclock.convert_timezone(
                                 dt.strptime(timelog_row.get("stop"), "%Y-%m-%dT%H:%M:%SZ"),
-                                current_user.timezone
+                                session.get("timezone")
                             ).strftime("%Y-%m-%d %H:%M")
                         )
                 return render_template("adjust_itemselect.html", items=row_list, item_type=item_type)
@@ -139,7 +139,7 @@ def adjust_item(item_type, id):
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
-        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form), current_user.timezone)
+        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form), session.get("timezone"))
         if type(report_data) != int:
             return render_template("report_result.html", title="Report Result", report_data=report_data)
         else:
@@ -149,7 +149,7 @@ def report():
 @app.route("/users")
 def users():
     form = UserForm()
-    return render_template("users.html", user=current_user, form=form)
+    return render_template("users.html", user=timeclock.get_user_by_token(session.get("token")), form=form)
 
 @app.route("/logout")
 def logout():
