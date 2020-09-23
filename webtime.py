@@ -52,9 +52,9 @@ def login():
         return redirect(url_for("users"))
     form = LoginForm()
     if form.validate_on_submit():
-        new_user = timeclock.login_user(form)
+        new_user, user_token = timeclock.login_user(form)
         if new_user:
-            session["user_token"] = new_user.get("user_token")
+            session["user_token"] = user_token
             session["timezone"] = new_user.get("timezone")
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))

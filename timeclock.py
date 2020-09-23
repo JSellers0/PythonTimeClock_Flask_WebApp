@@ -98,7 +98,7 @@ class TimeClock():
         user = {"user_token": s.dumps([form.user_name.data, form.password.data])}
         response = requests.post(aws_route + "/users/token", json=user)
         if response.status_code == 200:
-            return response.json()
+            return response.json(), user.get("user_token")
         else:
             flash("User Not Recognized.  Please check your info or Register an Account!", "danger")
             return None
