@@ -82,12 +82,12 @@ class TimeClock():
             return None
     
     def login_user(self, form):
-        user = User.query.filter(User.user_name == form.user_name.data)
+        user = User.query.filter(User.user_name == form.user_name.data).one_or_none()
 
-        if user and bcrypt.check_password_hash(form.user_token.data, form.password.data):
+        if user and bcrypt.check_password_hash(user.user_token, form.password.data):
             return user
         else:
-            return None
+            return
     
     def get_timerow(self, id):
         response = requests.get(aws_route + "/timelog/{id}".format(id=str(id)))
