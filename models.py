@@ -3,7 +3,7 @@ from flask_login import UserMixin
 
 @login_manager.user_loader
 def load_user(userid):
-    return User.query.get(int(userid))
+    return User.query.filter_by(userid=userid).first()
 
 class User(db.Model, UserMixin):
     userid = db.Column(db.Integer, primary_key=True)
@@ -20,3 +20,6 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return "User({}, {})".format(self.username, self.email)
+
+    def get_id(self):
+        return unicode(self.userid)
