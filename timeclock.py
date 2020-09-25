@@ -84,7 +84,7 @@ class TimeClock():
     def login_user(self, form):
         user = User.query.filter(User.user_name == form.user_name.data)
 
-        if user and bcrypt.check_password_hash(user.user_token, form.password.data):
+        if user and bcrypt.check_password_hash(form.user_token.data, form.password.data):
             return user
         else:
             return None

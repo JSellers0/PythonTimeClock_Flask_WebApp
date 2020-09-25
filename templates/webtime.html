@@ -4,9 +4,8 @@
 {% block page_name %}Python/Flask Time Clock{% endblock %}
 
 {% block body %}
-{{ session.get("user_token") }}
 <div class="content-section">
-    {% if session.get("user_token") %}
+    {% if current_user.is_authenticated %}
     <div>
         {% if "Click" in message %}
             <h1 id="message">{{ message }}</h1>
