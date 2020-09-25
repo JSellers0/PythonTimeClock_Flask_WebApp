@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt()
 bcrypt.init_app(app)
 
-login_manager = LoginManager()
+login_manager = LoginManager(app)
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'danger'
 
