@@ -22,4 +22,4 @@ class User(db.Model, UserMixin):
         return "User({}, {})".format(self.username, self.email)
 
     def get_id(self):
-        return unicode(self.userid)
+        return str(self.userid)
