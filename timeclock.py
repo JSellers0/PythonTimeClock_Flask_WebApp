@@ -7,12 +7,11 @@ import pandas as pd
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil import tz
-from itsdangerous import Serializer
 from flask import flash
 
-from config import aws_route
+from config import aws_route, bcrypt, db
+from models import User
 
-s = Serializer("16bOEuoyrWn1DxiIXWVsG9")
 
 class TimeClock():
     def __init__(self):
@@ -70,37 +69,24 @@ class TimeClock():
         #self.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M")
 
     def register_user(self, form):
-        user = {
-            "user_name": form.user_name.data,
-            "email" : form.email.data,
-            "user_token": s.dumps([form.user_name.data, form.password.data]),
-            "timezone": form.timezone.data
-        }
-        resp = requests.post(aws_route + "/users", json=user)
-        if resp.status_code == 201:
-            flash("Account created for {}!  Please Log In."
-                .format(form.user_name.data), 
-                "success"
-            )
-            return 1
-        else:
-            # ToDo: Add more responses for errors.
+        new_user = User(
+            form.user_name.data, 
+            form.email.data,
+            bcrypt.generate_password_hash(form.password.data),
+            form.timezone.data)
+        try: 
+            db.session.add(new_user)
+            db.session.commit()
+            return new_user
+        except Exception as e:
             return None
-
-    def get_user_by_token(self, token):
-        user = {"user_token": token}
-
-        response = requests.post(aws_route + "/users/token", json=user)
-        if response.status_code == 200:
-            return response.json()
     
     def login_user(self, form):
-        user = {"user_token": s.dumps([form.user_name.data, form.password.data])}
-        response = requests.post(aws_route + "/users/token", json=user)
-        if response.status_code == 200:
-            return response.json(), user.get("user_token")
+        user = User.query.filter(User.user_name == form.user_name.data)
+
+        if user and bcrypt.check_password_hash(user.user_token, form.password.data):
+            return user
         else:
-            flash("User Not Recognized.  Please check your info or Register an Account!", "danger")
             return None
     
     def get_timerow(self, id):

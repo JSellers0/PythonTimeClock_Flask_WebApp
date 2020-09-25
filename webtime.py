@@ -1,14 +1,13 @@
 from dateutil import tz
 from datetime import datetime as dt
 
-from flask import Flask, render_template, url_for, redirect, request, flash, session
+from flask import render_template, url_for, redirect, request, flash
+from flask_login import login_user, current_user, logout_user, login_required
 
 from forms import (RegisterForm, LoginForm, StartForm, DateSelectForm, ItemEditForm, UserForm)
 
+from config import app
 from timeclock import TimeClock
-
-app = Flask(__name__)
-app.secret_key = b';aeirja_)(_9u-a9jdfae90ej-e09!@aldjfa;'
 
 timeclock = TimeClock()
 
@@ -38,30 +37,34 @@ def webtime():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if session.get("user_token"):
+    if current_user.is_authenticated:
         return redirect(url_for("webtime"))
     form = RegisterForm()
     if form.validate_on_submit():
         if timeclock.register_user(form):
+            flash("Account Created for {}!  Please log in.".format(form.user_name.data), "success")
             return redirect(url_for("login"))
+        else:
+            flash("Error creating account.  Please try again.", "danger")
     return render_template("register.html", title="Registration", form=form)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if session.get("user_token"):
+    if current_user.is_authenticated:
         return redirect(url_for("users"))
     form = LoginForm()
     if form.validate_on_submit():
-        new_user, user_token = timeclock.login_user(form)
+        new_user = timeclock.login_user(form)
         if new_user:
-            session["user_token"] = user_token
-            session["timezone"] = new_user.get("timezone")
+            login_user(new_user, remember=form.remember.data)
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
-
+        else:
+            flash("User not recognized.  Please check your info or Register an Account!", "danger")
     return render_template("login.html", title="Login", form=form)
 
 @app.route("/start", methods=["POST", "GET"])
+@login_required
 def start():
     # Get lists for Start page
     project_list = timeclock.get_list("projects")
@@ -152,5 +155,6 @@ def users():
 
 @app.route("/logout")
 def logout():
+    logout_user()
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))
