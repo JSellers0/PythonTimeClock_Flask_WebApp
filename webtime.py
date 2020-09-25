@@ -10,6 +10,7 @@ from config import app
 from timeclock import TimeClock
 
 timeclock = TimeClock()
+current_user = None
 
 @app.route("/", methods=["GET", "PUT"])
 def webtime():
