@@ -1,7 +1,7 @@
 from dateutil import tz
 from datetime import datetime as dt
 
-from flask import render_template, url_for, redirect, request, flash
+from flask import render_template, url_for, redirect, request, flash, session
 from flask_login import login_user, current_user, logout_user, login_required
 
 from forms import (RegisterForm, LoginForm, StartForm, DateSelectForm, ItemEditForm, UserForm)
@@ -14,20 +14,20 @@ timeclock = TimeClock()
 @app.route("/", methods=["GET", "PUT"])
 def webtime():
     message = "Click Start to start timing!"
-    if timeclock.stop:
+    if session.stop:
         message = "Stopped tracking {pname} - {tname} \n {nname}".format(
-            pname=timeclock.project.get("name"),
-            tname=timeclock.task.get("name"),
-            nname=timeclock.note.get("name")
+            pname=session.project.get("name"),
+            tname=session.task.get("name"),
+            nname=session.note.get("name")
         )
         timeclock.reset_timelog_fields()
-    elif timeclock.timelogid != 0:
+    elif session.timelogid != 0:
         message = "Started {pname} - {tname} \n{nname} at {start}".format(
-            pname=timeclock.project.get("name"),
-            tname=timeclock.task.get("name"),
-            nname=timeclock.note.get("name"),
+            pname=session.project.get("name"),
+            tname=session.task.get("name"),
+            nname=session.note.get("name"),
             start=(
-                dt.strptime(timeclock.start, "%Y-%m-%dT%H:%M:%SZ")
+                dt.strptime(session.start, "%Y-%m-%dT%H:%M:%SZ")
                 .replace(tzinfo=tz.tzutc())
                 .astimezone(tz.tzlocal())
                 .strftime("%Y-%m-%d %H:%M")
