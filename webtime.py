@@ -176,6 +176,11 @@ def users():
 @login_required
 def logout():
     logout_user()
-    timeclock.reset_timelog_fields()
+    session.pop("timelogid", None)
+    session.pop("project", None)
+    session.pop("task", None)
+    session.pop("note", None)
+    session.pop("start", None)
+    session.pop("stop", None)
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))
