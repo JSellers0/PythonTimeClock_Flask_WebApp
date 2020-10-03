@@ -73,12 +73,13 @@ def start():
 
     form = StartForm()
     if form.validate_on_submit():
-        if timeclock.start_timing(form):
+        if timeclock.start_timing(form, current_user):
             return redirect(url_for("webtime"))
     return render_template("start.html", title="Start Timing", form=form, 
         projects=project_list, tasks=task_list, notes=note_list)
 
 @app.route("/stop", methods=["GET", "PUT"])
+@login_required
 def stop():
     if not timeclock.stop_timing():
         flash("There was an error stopping the timeclock", "danger")
@@ -86,10 +87,12 @@ def stop():
     return redirect(url_for("webtime"))
 
 @app.route("/adjust")
+@login_required
 def adjust():
     return render_template("adjust.html")
 
 @app.route("/adjust/<string:item_type>/", methods=["GET", "POST"])
+@login_required
 def adjust_itemselect(item_type):
     if item_type == "time":
         form = DateSelectForm()
@@ -121,6 +124,7 @@ def adjust_itemselect(item_type):
     return render_template("adjust_itemselect.html", items=item_list, item_type=item_type)
 
 @app.route("/adjust/item/<string:item_type>/<int:id>", methods=["GET", "POST"])
+@login_required
 def adjust_item(item_type, id):
     if item_type == "project":
         item = [project for project in timeclock.get_projects() if project["projectid"] == id][0]
@@ -138,6 +142,7 @@ def adjust_item(item_type, id):
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
 
 @app.route("/report", methods=["GET", "POST"])
+@login_required
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
@@ -149,12 +154,15 @@ def report():
     return render_template("report.html", title="Report Date Selection", form=form)
 
 @app.route("/users")
+@login_required
 def users():
     form = UserForm()
     return render_template("users.html", user=timeclock.get_user_by_token(session.get("token")), form=form)
 
 @app.route("/logout")
+@login_required
 def logout():
     logout_user()
+    timeclock.reset_timelog_fields()
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))

@@ -49,10 +49,6 @@ class TimeClock():
 
         return 0
 
-    def set_userid(self, userid):
-        self.userid = str(userid)
-        return 0
-
     def set_timelog_fields(self, timelog, form):
         self.timelogid = timelog.get("timelogid")
         self.project = {
@@ -256,7 +252,7 @@ class TimeClock():
                     return 0
         return 1
 
-    def start_timing(self, form):
+    def start_timing(self, form, user):
         if (form.project.data.lower() in self.get_list("projects")):
             projectid = self.projects[[project["project_name"] for project in self.projects].index(form.project.data.lower())]["projectid"]
         else:
@@ -274,7 +270,7 @@ class TimeClock():
 
         if projectid and taskid and noteid:
             timelog = {
-                    "userid": str(self.userid),
+                    "userid": str(user.userid),
                     "projectid": str(projectid),
                     "taskid": str(taskid),
                     "noteid": str(noteid),
