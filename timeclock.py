@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil import tz
-from flask import flash
+from flask import flash, session
 
 from config import aws_route, bcrypt, db
 from models import User
@@ -15,7 +15,6 @@ from models import User
 
 class TimeClock():
     def __init__(self):
-        self.userid = None
         self.reset_timelog_fields()
 
     def convert_timezone(self, my_time, to):
@@ -40,29 +39,28 @@ class TimeClock():
 
     def reset_timelog_fields(self):
         """ Reset timelog fields to default no value"""
-        self.timelogid = 0
-        self.project = {}
-        self.task = {}
-        self.note = {}
-        self.start = None
-        self.stop = 0
+        session.timelogid = 0
+        session.project = {}
+        session.task = {}
+        session.note = {}
+        session.start = None
+        session.stop = 0
 
         return 0
 
     def set_timelog_fields(self, timelog, form):
-        self.timelogid = timelog.get("timelogid")
-        self.project = {
+        session.timelogid = timelog.get("timelogid")
+        session.project = {
             "name": form.project.data.lower(),
             "id": timelog.get("projectid")}
-        self.task = {
+        session.task = {
             "name": form.task.data.lower(),
             "id": timelog.get("taskid")}
-        self.note = {
+        session.note = {
             "name": form.note.data.lower(),
             "id": timelog.get("noteid")}
-        self.start = timelog.get("start")
-        self.stop = 0
-        #self.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), "local").strftime("%Y-%m-%d %H:%M")
+        session.start = timelog.get("start")
+        session.stop = 0
 
     def register_user(self, form):
         new_user = User(
@@ -281,7 +279,7 @@ class TimeClock():
             tl_resp = requests.post(aws_route + "/timelog", json=timelog)
             if tl_resp.status_code == 201:
                 if self.timelogid:
-                    self.stop_timing(stop=timelog.get("start"))
+                    self.stop_timing(user=user, stop=timelog.get("start"))
                 self.set_timelog_fields(tl_resp.json(), form)
                 return 1
             else:
@@ -291,28 +289,28 @@ class TimeClock():
             flash("Something went wrong with id assignment", "danger")
             return None
         
-    def stop_timing(self, stop=None, user):
+    def stop_timing(self, user, stop=None):
         if stop:
             timelog = {
                 "userid": str(user.userid),
-                "projectid": str(self.project.get("id")),
-                "taskid": str(self.task.get("id")),
-                "noteid": str(self.note.get("id")),
-                "start": self.start,
+                "projectid": str(session.project.get("id")),
+                "taskid": str(session.task.get("id")),
+                "noteid": str(session.note.get("id")),
+                "start": session.start,
                 "stop": stop
             }
         else:
             timelog = {
                 "userid": str(user.userid),
-                "projectid": str(self.project.get("id")),
-                "taskid": str(self.task.get("id")),
-                "noteid": str(self.note.get("id")),
-                "start": self.start,
+                "projectid": str(session.project.get("id")),
+                "taskid": str(session.task.get("id")),
+                "noteid": str(session.note.get("id")),
+                "start": session.start,
                 "stop": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         response = requests.put(aws_route + "/timelog/" + str(self.timelogid), json=timelog)
         if response.status_code == 200:
-            self.stop = 1
+            session.stop = 1
             return 1
         else:
             return 0
