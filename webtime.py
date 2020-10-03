@@ -90,7 +90,7 @@ def start():
             session["project"] = {"id": timelog.get("projectid"), "name": form.project.data}
             session["task"] = {"id": timelog.get("taskid"), "name": form.task.data}
             session["note"] = {"id": timelog.get("noteid"), "name": form.note.data}
-            session["start"] = timeclock.convert_timezone(timelog.get("start"), current_user.timezone)
+            session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%d %H:%M"), current_user.timezone)
             session.pop("stop", None)
             return redirect(url_for("webtime"))
     return render_template("start.html", title="Start Timing", form=form, 
