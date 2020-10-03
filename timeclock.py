@@ -223,7 +223,7 @@ class TimeClock():
                     return 0
         return 1
 
-    def start_timing(self, form, user):
+    def start_timing(self, form, user, current_timelog=None, stop=0):
         if (form.project.data.lower() in self.get_list("projects")):
             projectid = self.projects[[project["project_name"] for project in self.projects].index(form.project.data.lower())]["projectid"]
         else:
@@ -251,9 +251,9 @@ class TimeClock():
 
             tl_resp = requests.post(aws_route + "/timelog", json=timelog)
             if tl_resp.status_code == 201:
-                if self.timelogid:
-                    self.stop_timing(user=user, stop=timelog.get("start"))
-                self.set_timelog_fields(tl_resp.json(), form)
+                if stop:
+                    current_timelog["stop"] = timelog.get("start")
+                    self.stop_timing(timelog=current_timelog, has_stop=True)
                 return timelog
             else:
                 flash("Something went wrong with timelog post", "danger")
@@ -262,26 +262,12 @@ class TimeClock():
             flash("Something went wrong with id assignment", "danger")
             return None
         
-    def stop_timing(self, user, stop=None):
-        if stop:
-            timelog = {
-                "userid": str(user.userid),
-                "projectid": str(session["project"].get("id")),
-                "taskid": str(session["task"].get("id")),
-                "noteid": str(session["note"].get("id")),
-                "start": session["start"],
-                "stop": stop
-            }
-        else:
-            timelog = {
-                "userid": str(user.userid),
-                "projectid": str(session["project"].get("id")),
-                "taskid": str(session["task"].get("id")),
-                "noteid": str(session["note"].get("id")),
-                "start": session["start"],
-                "stop": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-            }
-        response = requests.put(aws_route + "/timelog/" + str(self.timelogid), json=timelog)
+    def stop_timing(self, timelog, has_stop=False):
+        # Stop=None allows Start Timing to supply stop time to keep start/stop values in sync while
+        # allowing stop timing to stop at the current time.
+        if not has_stop:
+            timelog["stop"] = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        response = requests.put(aws_route + "/timelog/" + str(timelog.get("timelogid")), json=timelog)
         if response.status_code == 200:
             session["stop"] = 1
             return 1

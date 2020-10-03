@@ -73,7 +73,18 @@ def start():
 
     form = StartForm()
     if form.validate_on_submit():
-        timelog = timeclock.start_timing(form, current_user)
+        if "timelogid" in session:
+            current_timelog = {
+                "userid": current_user.userid
+                "timelogid": session["timelogid"],
+                "projectid": session["projectid"].get("id"),
+                "taskid": session["taskid"].get("id"),
+                "noteid": session["noteid"].get("id"),
+                "start": session["start"]
+            }
+            timelog = timeclock.start_timing(form, current_user, current_timelog=current_timelog, stop=1)
+        else:
+            timelog = timeclock.start_timing(form, current_user)
         if timelog:
             session["timelogid"] = timelog.get("timelogid")
             session["project"] = {"id": timelog.get("projectid"), "name": form.project.data}
@@ -88,15 +99,26 @@ def start():
 @app.route("/stop", methods=["GET", "PUT"])
 @login_required
 def stop():
-    if not timeclock.stop_timing(current_user):
-        flash("There was an error stopping the timeclock", "danger")
+    if "timelogid" in session:
+        current_timelog = {
+                "userid": current_user.userid
+                "timelogid": session["timelogid"],
+                "projectid": session["projectid"].get("id"),
+                "taskid": session["taskid"].get("id"),
+                "noteid": session["noteid"].get("id"),
+                "start": session["start"]
+            }
+        if not timeclock.stop_timing(current_timelog):
+            flash("There was an error stopping the timeclock.", "danger")
+        else:
+            session.pop("timelogid", None)
+            session.pop("project", None)
+            session.pop("task", None)
+            session.pop("note", None)
+            session.pop("start", None)
+            session["stop"] = 1
     else:
-        session.pop("timelogid", None)
-        session.pop("project", None)
-        session.pop("task", None)
-        session.pop("note", None)
-        session.pop("start", None)
-        session["stop"] = 1
+        flash("Not currently timing anything.", "danger")
     return redirect(url_for("webtime"))
 
 @app.route("/adjust")
