@@ -26,10 +26,7 @@ def webtime():
             pname=session["project"].get("name"),
             tname=session["task"].get("name"),
             nname=session["note"].get("name"),
-            start=(timeclock.convert_timezone(
-                dt.strptime(session["start"], "%Y-%m-%dT%H:%M:%SZ"), 
-                current_user.timezone).strftime("%Y-%m-%d %H:%M")
-                )
+            start=session["start"]
         )
     return render_template("webtime.html", title="PythonTimeClock", message=message)
 
@@ -88,7 +85,7 @@ def start():
             session["project"] = {"id": timelog.get("projectid"), "name": form.project.data}
             session["task"] = {"id": timelog.get("taskid"), "name": form.task.data}
             session["note"] = {"id": timelog.get("noteid"), "name": form.note.data}
-            session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), current_user.timezone)
+            session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), current_user.timezone).strftime("%Y-%m-%d %H:%M")
             session.pop("stop", None)
             return redirect(url_for("webtime"))
     return render_template("start.html", title="Start Timing", form=form, 
