@@ -157,7 +157,7 @@ def report():
 @login_required
 def users():
     form = UserForm()
-    return render_template("users.html", user=current_user), form=form)
+    return render_template("users.html", user=current_user, form=form)
 
 @app.route("/logout")
 @login_required
