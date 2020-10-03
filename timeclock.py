@@ -14,8 +14,6 @@ from models import User
 
 
 class TimeClock():
-    def __init__(self):
-        self.reset_timelog_fields()
 
     def convert_timezone(self, my_time, to):
         """Convert provided DateTime Object between UTC and Local Timezone

@@ -14,14 +14,14 @@ timeclock = TimeClock()
 @app.route("/", methods=["GET", "PUT"])
 def webtime():
     message = "Click Start to start timing!"
-    if session["stop"]:
+    if "stop" in session:
         message = "Stopped tracking {pname} - {tname} \n {nname}".format(
             pname=session["project"].get("name"),
             tname=session["task"].get("name"),
             nname=session["note"].get("name")
         )
         timeclock.reset_timelog_fields()
-    elif session.timelogid != 0:
+    elif "timelogid" in session:
         message = "Started {pname} - {tname} \n{nname} at {start}".format(
             pname=session["project"].get("name"),
             tname=session["task"].get("name"),
