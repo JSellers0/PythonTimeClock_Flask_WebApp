@@ -37,31 +37,6 @@ class TimeClock():
                 .astimezone(tz.tz.gettz(to))
             )
 
-    def reset_timelog_fields(self):
-        """ Reset timelog fields to default no value"""
-        session["timelogid"] = 0
-        session["project"] = {}
-        session["task"] = {}
-        session["note"] = {}
-        session["start"] = None
-        session["stop"] = 0
-
-        return 0
-
-    def set_timelog_fields(self, timelog, form):
-        session["timelogid"] = timelog.get("timelogid")
-        session["project"] = {
-            "name": form.project.data.lower(),
-            "id": timelog.get("projectid")}
-        session["task"] = {
-            "name": form.task.data.lower(),
-            "id": timelog.get("taskid")}
-        session["note"] = {
-            "name": form.note.data.lower(),
-            "id": timelog.get("noteid")}
-        session["start"] = timelog.get("start")
-        session["stop"] = 0
-
     def register_user(self, form):
         new_user = User(
             form.user_name.data, 
@@ -281,7 +256,7 @@ class TimeClock():
                 if self.timelogid:
                     self.stop_timing(user=user, stop=timelog.get("start"))
                 self.set_timelog_fields(tl_resp.json(), form)
-                return 1
+                return timelog
             else:
                 flash("Something went wrong with timelog post", "danger")
                 return None

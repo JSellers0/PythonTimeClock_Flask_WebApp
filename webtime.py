@@ -73,7 +73,14 @@ def start():
 
     form = StartForm()
     if form.validate_on_submit():
-        if timeclock.start_timing(form, current_user):
+        timelog = timeclock.start_timing(form, current_user)
+        if timelog:
+            session["timelogid"] = timelog.get("timelogid")
+            session["project"] = {"id": timelog.get("projectid"), "name": form.project.data}
+            session["task"] = {"id": timelog.get("taskid"), "name": form.task.data}
+            session["note"] = {"id": timelog.get("noteid"), "name": form.note.data}
+            session["start"] = timeclock.convert_timezone(timelog.get("start"), current_user.timezone)
+            session.pop("stop", None)
             return redirect(url_for("webtime"))
     return render_template("start.html", title="Start Timing", form=form, 
         projects=project_list, tasks=task_list, notes=note_list)
@@ -83,7 +90,13 @@ def start():
 def stop():
     if not timeclock.stop_timing(current_user):
         flash("There was an error stopping the timeclock", "danger")
-        return redirect(url_for("webtime"))
+    else:
+        session.pop("timelogid", None)
+        session.pop("project", None)
+        session.pop("task", None)
+        session.pop("note", None)
+        session.pop("start", None)
+        session["stop"] = 1
     return redirect(url_for("webtime"))
 
 @app.route("/adjust")
