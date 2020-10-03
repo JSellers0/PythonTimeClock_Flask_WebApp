@@ -39,28 +39,28 @@ class TimeClock():
 
     def reset_timelog_fields(self):
         """ Reset timelog fields to default no value"""
-        session.timelogid = 0
-        session.project = {}
-        session.task = {}
-        session.note = {}
-        session.start = None
-        session.stop = 0
+        session["timelogid"] = 0
+        session["project"] = {}
+        session["task"] = {}
+        session["note"] = {}
+        session["start"] = None
+        session["stop"] = 0
 
         return 0
 
     def set_timelog_fields(self, timelog, form):
-        session.timelogid = timelog.get("timelogid")
-        session.project = {
+        session["timelogid"] = timelog.get("timelogid")
+        session["project"] = {
             "name": form.project.data.lower(),
             "id": timelog.get("projectid")}
-        session.task = {
+        session["task"] = {
             "name": form.task.data.lower(),
             "id": timelog.get("taskid")}
-        session.note = {
+        session["note"] = {
             "name": form.note.data.lower(),
             "id": timelog.get("noteid")}
-        session.start = timelog.get("start")
-        session.stop = 0
+        session["start"] = timelog.get("start")
+        session["stop"] = 0
 
     def register_user(self, form):
         new_user = User(
@@ -293,24 +293,24 @@ class TimeClock():
         if stop:
             timelog = {
                 "userid": str(user.userid),
-                "projectid": str(session.project.get("id")),
-                "taskid": str(session.task.get("id")),
-                "noteid": str(session.note.get("id")),
-                "start": session.start,
+                "projectid": str(session["project"].get("id")),
+                "taskid": str(session["task"].get("id")),
+                "noteid": str(session["note"].get("id")),
+                "start": session["start"],
                 "stop": stop
             }
         else:
             timelog = {
                 "userid": str(user.userid),
-                "projectid": str(session.project.get("id")),
-                "taskid": str(session.task.get("id")),
-                "noteid": str(session.note.get("id")),
-                "start": session.start,
+                "projectid": str(session["project"].get("id")),
+                "taskid": str(session["task"].get("id")),
+                "noteid": str(session["note"].get("id")),
+                "start": session["start"],
                 "stop": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         response = requests.put(aws_route + "/timelog/" + str(self.timelogid), json=timelog)
         if response.status_code == 200:
-            session.stop = 1
+            session["stop"] = 1
             return 1
         else:
             return 0
