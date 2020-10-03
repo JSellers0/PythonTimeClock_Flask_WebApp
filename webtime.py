@@ -81,7 +81,7 @@ def start():
 @app.route("/stop", methods=["GET", "PUT"])
 @login_required
 def stop():
-    if not timeclock.stop_timing():
+    if not timeclock.stop_timing(current_user):
         flash("There was an error stopping the timeclock", "danger")
         return redirect(url_for("webtime"))
     return redirect(url_for("webtime"))
@@ -146,7 +146,7 @@ def adjust_item(item_type, id):
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
-        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form), session.get("timezone"))
+        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form), current_user.timezone)
         if type(report_data) != int:
             return render_template("report_result.html", title="Report Result", report_data=report_data)
         else:
@@ -157,7 +157,7 @@ def report():
 @login_required
 def users():
     form = UserForm()
-    return render_template("users.html", user=timeclock.get_user_by_token(session.get("token")), form=form)
+    return render_template("users.html", user=current_user), form=form)
 
 @app.route("/logout")
 @login_required

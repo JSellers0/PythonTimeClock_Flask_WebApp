@@ -158,7 +158,7 @@ class TimeClock():
             if response.status_code == 200:
                 return 1
             else:
-                flash("Error Updating Note", "danger")
+                flash("Error Updating Project", "danger")
                 return 0
         elif item_type == "task":
             task = {
@@ -169,7 +169,7 @@ class TimeClock():
             if response.status_code == 200:
                 return 1
             else:
-                flash("Error Updating Note", "danger")
+                flash("Error Updating Task", "danger")
                 return 0
         elif item_type == "note":
             note = {
@@ -291,10 +291,10 @@ class TimeClock():
             flash("Something went wrong with id assignment", "danger")
             return None
         
-    def stop_timing(self, stop=None):
+    def stop_timing(self, stop=None, user):
         if stop:
             timelog = {
-                "userid": str(self.userid),
+                "userid": str(user.userid),
                 "projectid": str(self.project.get("id")),
                 "taskid": str(self.task.get("id")),
                 "noteid": str(self.note.get("id")),
@@ -303,7 +303,7 @@ class TimeClock():
             }
         else:
             timelog = {
-                "userid": str(self.userid),
+                "userid": str(user.userid),
                 "projectid": str(self.project.get("id")),
                 "taskid": str(self.task.get("id")),
                 "noteid": str(self.note.get("id")),
