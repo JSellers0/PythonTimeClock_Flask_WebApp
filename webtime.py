@@ -75,12 +75,12 @@ def start():
     if form.validate_on_submit():
         if "timelogid" in session:
             current_timelog = {
-                "userid": current_user.userid
+                "userid": current_user.userid,
                 "timelogid": session["timelogid"],
                 "projectid": session["projectid"].get("id"),
                 "taskid": session["taskid"].get("id"),
                 "noteid": session["noteid"].get("id"),
-                "start": session["start"]
+                "start": session["start"],
             }
             timelog = timeclock.start_timing(form, current_user, current_timelog=current_timelog, stop=1)
         else:
@@ -101,12 +101,12 @@ def start():
 def stop():
     if "timelogid" in session:
         current_timelog = {
-                "userid": current_user.userid
+                "userid": current_user.userid,
                 "timelogid": session["timelogid"],
                 "projectid": session["projectid"].get("id"),
                 "taskid": session["taskid"].get("id"),
                 "noteid": session["noteid"].get("id"),
-                "start": session["start"]
+                "start": session["start"],
             }
         if not timeclock.stop_timing(current_timelog):
             flash("There was an error stopping the timeclock.", "danger")
