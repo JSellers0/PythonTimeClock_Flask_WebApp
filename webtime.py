@@ -26,11 +26,9 @@ def webtime():
             pname=session["project"].get("name"),
             tname=session["task"].get("name"),
             nname=session["note"].get("name"),
-            start=(
-                dt.strptime(session["start"], "%Y-%m-%dT%H:%M:%SZ")
-                .replace(tzinfo=tz.tzutc())
-                .astimezone(tz.tzlocal())
-                .strftime("%Y-%m-%d %H:%M")
+            start=(timeclock.convert_timezone(
+                dt.strptime(session["start"], "%Y-%m-%dT%H:%M:%SZ"), 
+                current_user.timezone).strftime("%Y-%m-%d %H:%M")
                 )
         )
     return render_template("webtime.html", title="PythonTimeClock", message=message)
