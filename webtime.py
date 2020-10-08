@@ -20,7 +20,6 @@ def webtime():
             tname=session["task"].get("name"),
             nname=session["note"].get("name")
         )
-        timeclock.reset_timelog_fields()
     elif "timelogid" in session:
         message = "Started {pname} - {tname} \n{nname} at {start}".format(
             pname=session["project"].get("name"),
@@ -72,9 +71,9 @@ def start():
             current_timelog = {
                 "userid": current_user.userid,
                 "timelogid": session["timelogid"],
-                "projectid": session["projectid"].get("id"),
-                "taskid": session["taskid"].get("id"),
-                "noteid": session["noteid"].get("id"),
+                "projectid": session["project"].get("id"),
+                "taskid": session["task"].get("id"),
+                "noteid": session["note"].get("id"),
                 "start": session["start"],
             }
             timelog = timeclock.start_timing(form, current_user, current_timelog=current_timelog, stop=1)
@@ -99,18 +98,15 @@ def stop():
         current_timelog = {
                 "userid": current_user.userid,
                 "timelogid": session["timelogid"],
-                "projectid": session["projectid"].get("id"),
-                "taskid": session["taskid"].get("id"),
-                "noteid": session["noteid"].get("id"),
-                "start": timeclock.convert_timezone(datetime.strptime(session["start"], "%Y-%m-%d %H:%M"), "utc", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
+                "projectid": str(session["project"].get("id")),
+                "taskid": str(session["task"].get("id")),
+                "noteid": str(session["note"].get("id")),
+                "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "utc", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         if not timeclock.stop_timing(current_timelog):
             flash("There was an error stopping the timeclock.", "danger")
         else:
             session.pop("timelogid", None)
-            session.pop("project", None)
-            session.pop("task", None)
-            session.pop("note", None)
             session.pop("start", None)
             session["stop"] = 1
     else:
