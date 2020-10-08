@@ -93,6 +93,7 @@ def start():
 
 @app.route("/stop", methods=["GET", "PUT"])
 @login_required
+# API call works, so the problem has to be with the values I'm submitting.
 def stop():
     if "timelogid" in session:
         current_timelog = {
@@ -101,7 +102,7 @@ def stop():
                 "projectid": session["projectid"].get("id"),
                 "taskid": session["taskid"].get("id"),
                 "noteid": session["noteid"].get("id"),
-                "start": session["start"],
+                "start": timeclock.convert_timezone(datetime.strptime(session["start"], "%Y-%m-%d %H:%M"), "utc", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         if not timeclock.stop_timing(current_timelog):
             flash("There was an error stopping the timeclock.", "danger")

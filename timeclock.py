@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil import tz
-from flask import flash, session
+from flask import flash
 
 from config import aws_route, bcrypt, db
 from models import User
@@ -15,7 +15,7 @@ from models import User
 
 class TimeClock():
 
-    def convert_timezone(self, my_time, to):
+    def convert_timezone(self, my_time, to, orig=None):
         """Convert provided DateTime Object between UTC and Local Timezone
             :my_time - DateTime Object for conversion
             :to - timezone to convert to ("utc" or "local")
@@ -24,7 +24,7 @@ class TimeClock():
         if to == "utc":
             return (
                 my_time
-                .replace(tzinfo=tz.tzlocal())
+                .replace(tzinfo=tz.tz.gettz(orig))
                 .astimezone(tz.tzutc())
             )
 
@@ -119,7 +119,7 @@ class TimeClock():
             self.notes = self.get_notes()
             return [note["note_name"] for note in self.notes]
     
-    def update_item(self, form, item_type, id):
+    def update_item(self, form, item_type, id, timezone):
         if item_type == "project":
             project = {
                 "projectid": id,
@@ -179,7 +179,7 @@ class TimeClock():
                             "noteid": str(noteid),
                             "start": self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc"
+                                "utc", orig=timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": "na"
                         }                   
@@ -191,11 +191,11 @@ class TimeClock():
                             "noteid": str(noteid),
                             "start": self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc"
+                                "utc", orig=timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": self.convert_timezone(
                                 dt.strptime(form.stop.data, "%Y-%m-%d %H:%M"),
-                                "utc"
+                                "utc", orig=timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ")
                         }
 
@@ -215,7 +215,7 @@ class TimeClock():
                     if id == self.timelogid:
                         self.start = self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc"
+                                "utc", orig=timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ")
                     return 1
                 else:
@@ -254,7 +254,7 @@ class TimeClock():
                 if stop:
                     current_timelog["stop"] = timelog.get("start")
                     self.stop_timing(timelog=current_timelog, has_stop=True)
-                return timelog
+                return tl_resp.json()
             else:
                 flash("Something went wrong with timelog post", "danger")
                 return None
@@ -269,18 +269,17 @@ class TimeClock():
             timelog["stop"] = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         response = requests.put(aws_route + "/timelog/" + str(timelog.get("timelogid")), json=timelog)
         if response.status_code == 200:
-            session["stop"] = 1
             return 1
         else:
             return 0
 
-    def get_daterange_rows(self, form):
+    def get_daterange_rows(self, form, timezone):
         range_begin = (self.convert_timezone(
             dt.combine(
                 form.range_begin.data,
                 dt.min.time()
             ),
-            "utc"
+            "utc", orig=timezone
             ).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         if form.range_end.data:
@@ -289,7 +288,7 @@ class TimeClock():
                     form.range_end.data,
                     dt.max.time()
                 ),
-                "utc"
+                "utc", orig=timezone
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         else:
@@ -298,7 +297,7 @@ class TimeClock():
                     form.range_begin.data,
                     dt.max.time()
                 ),
-                "utc"
+                "utc", orig=timezone
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         query = {
