@@ -173,7 +173,7 @@ def adjust_item(item_type, id):
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
-        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form), current_user.timezone)
+        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form, user), current_user.timezone)
         if type(report_data) != int:
             return render_template("report_result.html", title="Report Result", report_data=report_data)
         else:

@@ -15,25 +15,14 @@ from models import User
 
 class TimeClock():
 
-    def convert_timezone(self, my_time, to, orig=None):
+    def convert_timezone(self, my_time, to, orig="utc"):
         """Convert provided DateTime Object between UTC and Local Timezone
-            :my_time - DateTime Object for conversion
-            :to - timezone to convert to ("utc" or "local")
+            @my_time-DateTime or Time Object: DateTime or Time to convert
+            @to-string: timezone to convert to
+            @orig-string: timezone to convert from
         returns DateTime Object or None if tz not supported.  Handle your own damn formatting.
         """
-        if to == "utc":
-            return (
-                my_time
-                .replace(tzinfo=tz.tz.gettz(orig))
-                .astimezone(tz.tzutc())
-            )
-
-        else:
-            return (
-                my_time
-                .replace(tzinfo=tz.tzutc())
-                .astimezone(tz.tz.gettz(to))
-            )
+        return (my_time.replace(tzinfo=tz.tz.get(orig)).astimezone(tz.tz.gettz(to)))
 
     def register_user(self, form):
         new_user = User(
@@ -273,13 +262,13 @@ class TimeClock():
         else:
             return 0
 
-    def get_daterange_rows(self, form, timezone):
+    def get_daterange_rows(self, form, user):
         range_begin = (self.convert_timezone(
             dt.combine(
                 form.range_begin.data,
                 dt.min.time()
             ),
-            "utc", orig=timezone
+            "utc", orig=user.timezone
             ).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         if form.range_end.data:
@@ -288,7 +277,7 @@ class TimeClock():
                     form.range_end.data,
                     dt.max.time()
                 ),
-                "utc", orig=timezone
+                "utc", orig=user.timezone
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         else:
@@ -297,11 +286,11 @@ class TimeClock():
                     form.range_begin.data,
                     dt.max.time()
                 ),
-                "utc", orig=timezone
+                "utc", orig=user.timezone
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         query = {
-            "userid": self.userid,
+            "userid": user.userid,
             "range_begin": range_begin,
             "range_end": range_end
             }
