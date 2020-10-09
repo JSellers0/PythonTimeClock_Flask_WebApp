@@ -108,7 +108,7 @@ class TimeClock():
             self.notes = self.get_notes()
             return [note["note_name"] for note in self.notes]
     
-    def update_item(self, form, item_type, id, timezone):
+    def update_item(self, form, item_type, id, user):
         if item_type == "project":
             project = {
                 "project_name": form.project.data
@@ -177,29 +177,29 @@ class TimeClock():
                 
                 if form.stop.data == "1900-01-01 00:00" or form.stop.data.replace(" ", "") == "":
                     timelog = {
-                            "userid": str(self.userid),
+                            "userid": str(user.userid),
                             "projectid": str(projectid),
                             "taskid": str(taskid),
                             "noteid": str(noteid),
                             "start": self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=timezone
+                                "utc", orig=user.timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": "na"
                         }                   
                 else:
                     timelog = {
-                            "userid": str(self.userid),
+                            "userid": str(user.userid),
                             "projectid": str(projectid),
                             "taskid": str(taskid),
                             "noteid": str(noteid),
                             "start": self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=timezone
+                                "utc", orig=user.timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": self.convert_timezone(
                                 dt.strptime(form.stop.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=timezone
+                                "utc", orig=user.timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ")
                         }
 
@@ -215,12 +215,6 @@ class TimeClock():
                             pass
                         else:
                             flash("Error getting timelog row for adjacent check.", "danger")
-
-                    if id == self.timelogid:
-                        self.start = self.convert_timezone(
-                                dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=timezone
-                            ).strftime("%Y-%m-%dT%H:%M:%SZ")
                     return 1
                 else:
                     flash("Error Updating Timelog Row", "danger")

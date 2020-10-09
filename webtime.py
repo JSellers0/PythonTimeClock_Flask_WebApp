@@ -163,7 +163,8 @@ def adjust_item(item_type, id):
         item = [time for time in session["row_list"] if time["timelogid"] == str(id)][0]
     form = ItemEditForm()
     if form.validate_on_submit():
-        if timeclock.update_item(form, item_type, id, current_user.timezone):
+        if timeclock.update_item(form, item_type, id, current_user):
+            # Need to handle if updating user's current item type id here since move to sessions to hold data.
             flash("Item updated successfully!", "success")
             return redirect(url_for("adjust_itemselect", item_type=item_type))
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
