@@ -113,7 +113,7 @@ class TimeClock():
             project = {
                 "project_name": form.project.data
             }
-            response = requests.put(aws_route + "/projects/" + str(id), query=project)
+            response = requests.put(aws_route + "/projects/" + str(id), params=project)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
@@ -129,7 +129,7 @@ class TimeClock():
             task = {
                 "task_name": form.task.data
             }
-            response = requests.put(aws_route + "/tasks/" + str(id), query=task)
+            response = requests.put(aws_route + "/tasks/" + str(id), params=task)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
@@ -145,7 +145,7 @@ class TimeClock():
             note = {
                 "note_name": form.note.data
             }
-            response = requests.put(aws_route + "/notes/" + str(id), query=note)
+            response = requests.put(aws_route + "/notes/" + str(id), params=note)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
