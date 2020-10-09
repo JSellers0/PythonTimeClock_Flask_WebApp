@@ -111,10 +111,9 @@ class TimeClock():
     def update_item(self, form, item_type, id, timezone):
         if item_type == "project":
             project = {
-                "projectid": str(id),
                 "project_name": form.project.data
             }
-            response = requests.put(aws_route + "/projects/" + str(id), json=project)
+            response = requests.put(aws_route + "/projects/" + str(id), query=project)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
@@ -128,10 +127,9 @@ class TimeClock():
                 return 0
         elif item_type == "task":
             task = {
-                "taskid": id,
                 "task_name": form.task.data
             }
-            response = requests.put(aws_route + "/tasks/" + str(id), json=task)
+            response = requests.put(aws_route + "/tasks/" + str(id), query=task)
             if response.status_code == 200:
                 return 1
              elif response.status_code == 404:
@@ -145,10 +143,9 @@ class TimeClock():
                 return 0
         elif item_type == "note":
             note = {
-                "noteid": id,
                 "note_name": form.note.data
             }
-            response = requests.put(aws_route + "/notes/" + str(id), json=note)
+            response = requests.put(aws_route + "/notes/" + str(id), query=note)
             if response.status_code == 200:
                 return 1
              elif response.status_code == 404:
