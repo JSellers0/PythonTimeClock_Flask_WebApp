@@ -22,7 +22,7 @@ class TimeClock():
             @orig-string: timezone to convert from
         returns DateTime Object or None if tz not supported.  Handle your own damn formatting.
         """
-        return (my_time.replace(tzinfo=tz.tz.get(orig)).astimezone(tz.tz.gettz(to)))
+        return (my_time.replace(tzinfo=tz.tz.gettz(orig)).astimezone(tz.tz.gettz(to)))
 
     def register_user(self, form):
         new_user = User(
@@ -111,7 +111,7 @@ class TimeClock():
     def update_item(self, form, item_type, id, timezone):
         if item_type == "project":
             project = {
-                "projectid": id,
+                "projectid": str(id),
                 "project_name": form.project.data
             }
             response = requests.put(aws_route + "/projects/" + str(id), json=project)
@@ -303,7 +303,7 @@ class TimeClock():
             flash("Error reading rows with dates submitted.", "danger")
             return 0
 
-    def process_daterange_rows(self, daterange_rows, timezone):
+    def process_daterange_rows(self, daterange_rows, timezone, cur_tlid):
         if type(daterange_rows) == int:
             return 0
         daterange = pd.DataFrame()
@@ -318,7 +318,7 @@ class TimeClock():
                     timezone
                     ).strftime("%Y-%m-%d")
             )   
-            if row["timelogid"] == str(self.timelogid):
+            if row["timelogid"] == str(cur_tlid):
                 daterange.at[i, "hours"] = (dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
             elif not pd.isna(row["stop"]):
                 daterange.at[i, "hours"] = (dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600

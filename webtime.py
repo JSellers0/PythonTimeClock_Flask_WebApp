@@ -124,20 +124,20 @@ def adjust_itemselect(item_type):
     if item_type == "time":
         form = DateSelectForm()
         if form.validate_on_submit():
-            row_list = timeclock.get_daterange_rows(form)
+            row_list = timeclock.get_daterange_rows(form, current_user)
             if row_list:
                 for timelog_row in [timelog_row for timelog_row in row_list]:
                     timelog_row["start"] = (
                         timeclock.convert_timezone(
                             dt.strptime(timelog_row.get("start"), "%Y-%m-%dT%H:%M:%SZ"),
-                            session.get("timezone")
+                            current_user.timezone
                         ).strftime("%Y-%m-%d %H:%M")
                     )
                     if timelog_row.get("stop"):
                         timelog_row["stop"] = (
                             timeclock.convert_timezone(
                                 dt.strptime(timelog_row.get("stop"), "%Y-%m-%dT%H:%M:%SZ"),
-                                session.get("timezone")
+                                current_user.timezone
                             ).strftime("%Y-%m-%d %H:%M")
                         )
                 return render_template("adjust_itemselect.html", items=row_list, item_type=item_type)
@@ -163,7 +163,7 @@ def adjust_item(item_type, id):
         item = [time for time in timeclock.date_range_rows if time["timelogid"] == str(id)][0]
     form = ItemEditForm()
     if form.validate_on_submit():
-        if timeclock.update_item(form, item_type, id):
+        if timeclock.update_item(form, item_type, id, current_user.timezone):
             flash("Item updated successfully!", "success")
             return redirect(url_for("adjust_itemselect", item_type=item_type))
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
@@ -173,7 +173,7 @@ def adjust_item(item_type, id):
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
-        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form, user), current_user.timezone)
+        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form, current_user), current_user.timezone, session.get("timelogid"))
         if type(report_data) != int:
             return render_template("report_result.html", title="Report Result", report_data=report_data)
         else:
