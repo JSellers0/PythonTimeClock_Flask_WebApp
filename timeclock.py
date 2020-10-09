@@ -124,7 +124,7 @@ class TimeClock():
                 flash("Error.  Project Name {} already exists.".format(form.project.data))
                 return 0
             else:
-                flash("Error Updating Project", "danger")
+                flash("Error Updating Project: " + response.text, "danger")
                 return 0
         elif item_type == "task":
             task = {
@@ -141,7 +141,7 @@ class TimeClock():
                 flash("Error.  Task Name {} already exists.".format(form.task.data))
                 return 0
             else:
-                flash("Error Updating Task", "danger")
+                flash("Error Updating Task: " + response.text, "danger")
                 return 0
         elif item_type == "note":
             note = {
@@ -158,7 +158,7 @@ class TimeClock():
                 flash("Error.  Note Name {} already exists.".format(form.note.data))
                 return 0
             else:
-                flash("Error Updating Note", "danger")
+                flash("Error Updating Note: " + response.text, "danger")
                 return 0
         elif item_type == "time":
             if (form.project.data.lower() in self.get_list("projects")):
