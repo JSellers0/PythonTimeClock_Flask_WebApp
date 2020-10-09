@@ -124,9 +124,9 @@ def adjust_itemselect(item_type):
     if item_type == "time":
         form = DateSelectForm()
         if form.validate_on_submit():
-            row_list = timeclock.get_daterange_rows(form, current_user)
-            if row_list:
-                for timelog_row in [timelog_row for timelog_row in row_list]:
+            session["row_list"] = timeclock.get_daterange_rows(form, current_user)
+            if session.get("row_list"):
+                for timelog_row in [timelog_row for timelog_row in session["row_list"]]:
                     timelog_row["start"] = (
                         timeclock.convert_timezone(
                             dt.strptime(timelog_row.get("start"), "%Y-%m-%dT%H:%M:%SZ"),
@@ -140,7 +140,7 @@ def adjust_itemselect(item_type):
                                 current_user.timezone
                             ).strftime("%Y-%m-%d %H:%M")
                         )
-                return render_template("adjust_itemselect.html", items=row_list, item_type=item_type)
+                return render_template("adjust_itemselect.html", items=session["row_list"], item_type=item_type)
         return render_template("adjust_dateselect.html", form=form)
     if item_type == "project":
         item_list = timeclock.get_projects()
@@ -160,7 +160,7 @@ def adjust_item(item_type, id):
     elif item_type == "note":
         item = [note for note in timeclock.get_notes() if note["noteid"] == id][0]
     elif item_type == "time":
-        item = [time for time in timeclock.date_range_rows if time["timelogid"] == str(id)][0]
+        item = [time for time in session["row_list"] if time["timelogid"] == str(id)][0]
     form = ItemEditForm()
     if form.validate_on_submit():
         if timeclock.update_item(form, item_type, id, current_user.timezone):
