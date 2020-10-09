@@ -117,6 +117,12 @@ class TimeClock():
             response = requests.put(aws_route + "/projects/" + str(id), json=project)
             if response.status_code == 200:
                 return 1
+            elif response.status_code == 404:
+                flash("Error. Project {} does not exist.".format(str(id)))
+                return 0
+            elif response.status_code == 409:
+                flash("Error.  Project Name {} already exists.".format(form.project.data))
+                return 0
             else:
                 flash("Error Updating Project", "danger")
                 return 0
@@ -128,6 +134,12 @@ class TimeClock():
             response = requests.put(aws_route + "/tasks/" + str(id), json=task)
             if response.status_code == 200:
                 return 1
+             elif response.status_code == 404:
+                flash("Error. Task {} does not exist.".format(str(id)))
+                return 0
+            elif response.status_code == 409:
+                flash("Error.  Task Name {} already exists.".format(form.task.data))
+                return 0
             else:
                 flash("Error Updating Task", "danger")
                 return 0
@@ -139,6 +151,12 @@ class TimeClock():
             response = requests.put(aws_route + "/notes/" + str(id), json=note)
             if response.status_code == 200:
                 return 1
+             elif response.status_code == 404:
+                flash("Error. Note {} does not exist.".format(str(id)))
+                return 0
+            elif response.status_code == 409:
+                flash("Error.  Note Name {} already exists.".format(form.note.data))
+                return 0
             else:
                 flash("Error Updating Note", "danger")
                 return 0
