@@ -132,7 +132,7 @@ class TimeClock():
             response = requests.put(aws_route + "/tasks/" + str(id), query=task)
             if response.status_code == 200:
                 return 1
-             elif response.status_code == 404:
+            elif response.status_code == 404:
                 flash("Error. Task {} does not exist.".format(str(id)))
                 return 0
             elif response.status_code == 409:
@@ -148,7 +148,7 @@ class TimeClock():
             response = requests.put(aws_route + "/notes/" + str(id), query=note)
             if response.status_code == 200:
                 return 1
-             elif response.status_code == 404:
+            elif response.status_code == 404:
                 flash("Error. Note {} does not exist.".format(str(id)))
                 return 0
             elif response.status_code == 409:
