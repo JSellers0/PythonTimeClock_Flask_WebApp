@@ -81,9 +81,9 @@ def start():
             timelog = timeclock.start_timing(form, current_user)
         if timelog:
             session["timelogid"] = timelog.get("timelogid")
-            session["project"] = {"id": timelog.get("projectid"), "name": form.project.data}
-            session["task"] = {"id": timelog.get("taskid"), "name": form.task.data}
-            session["note"] = {"id": timelog.get("noteid"), "name": form.note.data}
+            session["project"] = {"id": timelog.get("projectid"), "name": form.project.data.lower()}
+            session["task"] = {"id": timelog.get("taskid"), "name": form.task.data.lower()}
+            session["note"] = {"id": timelog.get("noteid"), "name": form.note.data.lower()}
             session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), current_user.timezone).strftime("%Y-%m-%d %H:%M")
             session.pop("stop", None)
             return redirect(url_for("webtime"))
@@ -124,6 +124,7 @@ def adjust_itemselect(item_type):
     if item_type == "time":
         form = DateSelectForm()
         if form.validate_on_submit():
+            # ToDo: Store selected date in session so user doesn't have to re-select
             session["row_list"] = timeclock.get_daterange_rows(form, current_user)
             if session.get("row_list"):
                 for timelog_row in [timelog_row for timelog_row in session["row_list"]]:
@@ -164,7 +165,25 @@ def adjust_item(item_type, id):
     form = ItemEditForm()
     if form.validate_on_submit():
         if timeclock.update_item(form, item_type, id, current_user):
-            # Need to handle if updating user's current item type id here since move to sessions to hold data.
+            # ToDo: Need to handle if updating user's current item type id here since move to sessions to hold data.
+            if item_type == "project":
+                if session["project"].get("id") == id:
+                    session["project"].get("name") = form.project.data.lower()
+            elif item_type == "task":
+                if session["task"].get("id") == id:
+                    session["task"].get("name") = form.task.data.lower()
+            elif item_type == "note":
+                if session["note"].get("id") == id:
+                    session["note"].get("name") = form.note.data.lower()
+            elif item_type == "time":
+                if session.get("timelogid") == id:
+                    session["project"].get("name") = form.project.data.lower()
+                    session["task"].get("name") = form.task.data.lower()
+                    session["note"].get("name") = form.note.data.lower()
+                    session["start"] = timeclock.convert_timezone(
+                        dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
+                        "utc", orig=current_user.timezone
+                        ).strftime("%Y-%m-%dT%H:%M:%SZ")
             flash("Item updated successfully!", "success")
             return redirect(url_for("adjust_itemselect", item_type=item_type))
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)

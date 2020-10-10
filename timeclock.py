@@ -175,7 +175,7 @@ class TimeClock():
 
             if projectid and taskid and noteid:
                 
-                if form.stop.data == "1900-01-01 00:00" or form.stop.data.replace(" ", "") == "":
+                if form.stop.data == "None":
                     timelog = {
                             "userid": str(user.userid),
                             "projectid": str(projectid),
@@ -215,11 +215,13 @@ class TimeClock():
                             pass
                         else:
                             flash("Error getting timelog row for adjacent check.", "danger")
-                    return 1
+                    if item_type == "time":
+                        return timelog
+                    else:
+                        return 1
                 else:
                     flash("Error Updating Timelog Row", "danger")
                     return 0
-        return 1
 
     def start_timing(self, form, user, current_timelog=None, stop=0):
         if (form.project.data.lower() in self.get_list("projects")):
