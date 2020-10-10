@@ -134,3 +134,11 @@ tr {
   border-bottom-style: dotted;
   border-width: 1px;
 }
+
+.cell_name {
+  width: 30%;
+}
+
+.rpt_hours {
+  text-align: right;
+}

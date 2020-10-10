@@ -186,6 +186,8 @@ def adjust_item(item_type, id):
                         ).strftime("%Y-%m-%dT%H:%M:%SZ")
             flash("Item updated successfully!", "success")
             return redirect(url_for("adjust_itemselect", item_type=item_type))
+        else:
+            flash("Error updating item!", "danger")
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
 
 @app.route("/report", methods=["GET", "POST"])

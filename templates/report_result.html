@@ -18,14 +18,14 @@
                 <th>Project</th>
                 <th>Task</th>
                 <th>Note</th>
-                <th>Hours</th>
+                <th class="rpt_hours">Hours</th>
             </tr>
         {% for i, report_row in day_data.loc[day_data["project_name"] != "date_total_hours"].iterrows() %}
             <tr>
                 <td class="cell_name">{{ report_row["project_name"] }}</td>
                 <td class="cell_name">{{ report_row["task_name"] }}</td>
                 <td class="cell_name">{{ report_row["note_name"] }}</td>
-                <td class="cell_hours">{{ report_row["hours"] }}</td>
+                <td class="rpt_hours">{{ report_row["hours"] }}</td>
             </tr>
         {% endfor %}
         </table>
