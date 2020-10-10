@@ -168,18 +168,18 @@ def adjust_item(item_type, id):
             # ToDo: Need to handle if updating user's current item type id here since move to sessions to hold data.
             if item_type == "project":
                 if session["project"].get("id") == id:
-                    session["project"].get("name") = form.project.data.lower()
+                    session["project"]["name"] = form.project.data.lower()
             elif item_type == "task":
                 if session["task"].get("id") == id:
-                    session["task"].get("name") = form.task.data.lower()
+                    session["task"]["name"] = form.task.data.lower()
             elif item_type == "note":
                 if session["note"].get("id") == id:
-                    session["note"].get("name") = form.note.data.lower()
+                    session["note"]["name"] = form.note.data.lower()
             elif item_type == "time":
                 if session.get("timelogid") == id:
-                    session["project"].get("name") = form.project.data.lower()
-                    session["task"].get("name") = form.task.data.lower()
-                    session["note"].get("name") = form.note.data.lower()
+                    session["project"]["name"] = form.project.data.lower()
+                    session["task"]["name"] = form.task.data.lower()
+                    session["note"]["name"] = form.note.data.lower()
                     session["start"] = timeclock.convert_timezone(
                         dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
                         "utc", orig=current_user.timezone

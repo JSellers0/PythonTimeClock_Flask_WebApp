@@ -110,9 +110,7 @@ class TimeClock():
     
     def update_item(self, form, item_type, id, user):
         if item_type == "project":
-            project = {
-                "project_name": form.project.data
-            }
+            project = {"project_name": form.project.data.lower()}
             response = requests.put(aws_route + "/projects/" + str(id), params=project)
             if response.status_code == 200:
                 return 1
@@ -126,9 +124,7 @@ class TimeClock():
                 flash("Error Updating Project: " + response.text, "danger")
                 return 0
         elif item_type == "task":
-            task = {
-                "task_name": form.task.data
-            }
+            task = {"task_name": form.task.data.lower()}
             response = requests.put(aws_route + "/tasks/" + str(id), params=task)
             if response.status_code == 200:
                 return 1
@@ -142,9 +138,7 @@ class TimeClock():
                 flash("Error Updating Task: " + response.text, "danger")
                 return 0
         elif item_type == "note":
-            note = {
-                "note_name": form.note.data
-            }
+            note = {"note_name": form.note.data.lower()}
             response = requests.put(aws_route + "/notes/" + str(id), params=note)
             if response.status_code == 200:
                 return 1
