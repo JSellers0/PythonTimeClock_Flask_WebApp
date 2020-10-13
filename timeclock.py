@@ -302,7 +302,6 @@ class TimeClock():
         response = requests.get(aws_route+"/timelog/daterange", params=query)
         if response.status_code == 200:
             date_range_rows = json.loads(response.json())
-            self.date_range_rows = date_range_rows["rows"]
             return date_range_rows["rows"]
         else:
             flash("Error reading rows with dates submitted.", "danger")

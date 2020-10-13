@@ -124,7 +124,8 @@ def adjust_itemselect(item_type):
     if item_type == "time":
         form = DateSelectForm()
         if form.validate_on_submit():
-            # ToDo: Store selected date in session so user doesn't have to re-select
+            # ToDo: cache selected date so user doesn't have to re-select
+            # ToDo: cache returned date range rows so we don't have to hit API again
             session["row_list"] = timeclock.get_daterange_rows(form, current_user)
             if session.get("row_list"):
                 for timelog_row in [timelog_row for timelog_row in session["row_list"]]:
@@ -165,7 +166,6 @@ def adjust_item(item_type, id):
     form = ItemEditForm()
     if form.validate_on_submit():
         if timeclock.update_item(form, item_type, id, current_user):
-            # ToDo: Need to handle if updating user's current item type id here since move to sessions to hold data.
             if item_type == "project":
                 if session["project"].get("id") == id:
                     session["project"]["name"] = form.project.data.lower()
