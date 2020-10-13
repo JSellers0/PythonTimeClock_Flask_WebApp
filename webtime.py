@@ -13,6 +13,8 @@ timeclock = TimeClock()
 
 @app.route("/", methods=["GET", "PUT"])
 def webtime():
+    if "row_list" in session:
+        session.pop("row_list", None)
     message = "Click Start to start timing!"
     if "stop" in session:
         message = "Stopped tracking {pname} - {tname} \n {nname}".format(
