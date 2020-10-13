@@ -131,14 +131,14 @@ def adjust_itemselect(item_type):
             session["row_list"] = timeclock.get_daterange_rows(form, current_user)
             if session.get("row_list"):
                 for rl_i, timelog_row in enumerate(session["row_list"]):
-                    session["row_list"][i]["start"] = (
+                    session["row_list"][rl_i]["start"] = (
                         timeclock.convert_timezone(
                             dt.strptime(timelog_row.get("start"), "%Y-%m-%dT%H:%M:%SZ"),
                             current_user.timezone
                         ).strftime("%Y-%m-%d %H:%M")
                     )
                     if timelog_row.get("stop"):
-                        session["row_list"][i]["stop"] = (
+                        session["row_list"][rl_i]["stop"] = (
                             timeclock.convert_timezone(
                                 dt.strptime(timelog_row.get("stop"), "%Y-%m-%dT%H:%M:%SZ"),
                                 current_user.timezone
