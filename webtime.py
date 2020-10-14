@@ -129,7 +129,7 @@ def adjust_itemselect(item_type):
             # ToDo: cache selected date so user doesn't have to re-select
             # ToDo: cache returned date range rows so we don't have to hit API again
             session["row_list"] = timeclock.get_daterange_rows(form, current_user)
-                return render_template("adjust_itemselect.html", items=session["row_list"], item_type=item_type)
+            return render_template("adjust_itemselect.html", items=session["row_list"], item_type=item_type)
         return render_template("adjust_dateselect.html", form=form)
     if item_type == "project":
         item_list = timeclock.get_projects()
