@@ -302,6 +302,16 @@ class TimeClock():
         response = requests.get(aws_route+"/timelog/daterange", params=query)
         if response.status_code == 200:
             date_range_rows = json.loads(response.json())
+            for timelogrow in date_range_rows["rows"]:
+                timelogrow["start"] = self.convert_timezone(
+                    dt.strptime(timelogrow["start"] ,"%Y-%m-%dT%H:%M:%SZ"),
+                    user.timezone
+                    ).strptime("%Y-%m-%d %H:%M")
+                if timelogrow.get("stop"):
+                    timelogrow["stop"] = self.convert_timezone(
+                    dt.strptime(timelogrow["stop"] ,"%Y-%m-%dT%H:%M:%SZ"),
+                    user.timezone
+                    ).strptime("%Y-%m-%d %H:%M")
             return date_range_rows["rows"]
         else:
             flash("Error reading rows with dates submitted.", "danger")
