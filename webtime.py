@@ -103,7 +103,7 @@ def stop():
                 "projectid": str(session["project"].get("id")),
                 "taskid": str(session["task"].get("id")),
                 "noteid": str(session["note"].get("id")),
-                "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "utc", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
+                "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "UTC", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         if not timeclock.stop_timing(current_timelog):
             flash("There was an error stopping the timeclock.", "danger")
@@ -123,6 +123,8 @@ def adjust():
 @app.route("/adjust/<string:item_type>/", methods=["GET", "POST"])
 @login_required
 def adjust_itemselect(item_type):
+    if "row_list" in session:
+        session.pop("row_list", None)
     if item_type == "time":
         form = DateSelectForm()
         if form.validate_on_submit():
@@ -169,7 +171,7 @@ def adjust_item(item_type, id):
                     session["note"]["name"] = form.note.data.lower()
                     session["start"] = timeclock.convert_timezone(
                         dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                        "utc", orig=current_user.timezone
+                        "UTC", orig=current_user.timezone
                         ).strftime("%Y-%m-%dT%H:%M:%SZ")
             flash("Item updated successfully!", "success")
             return redirect(url_for("adjust_itemselect", item_type=item_type))

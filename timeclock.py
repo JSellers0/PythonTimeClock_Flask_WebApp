@@ -15,7 +15,7 @@ from models import User
 
 class TimeClock():
 
-    def convert_timezone(self, my_time, to, orig="utc"):
+    def convert_timezone(self, my_time, to, orig="UTC"):
         """Convert provided DateTime Object between UTC and Local Timezone
             @my_time-DateTime or Time Object: DateTime or Time to convert
             @to-string: timezone to convert to
@@ -177,7 +177,7 @@ class TimeClock():
                             "noteid": str(noteid),
                             "start": self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=user.timezone
+                                "UTC", orig=user.timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": "na"
                         }                   
@@ -189,11 +189,11 @@ class TimeClock():
                             "noteid": str(noteid),
                             "start": self.convert_timezone(
                                 dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=user.timezone
+                                "UTC", orig=user.timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "stop": self.convert_timezone(
                                 dt.strptime(form.stop.data, "%Y-%m-%d %H:%M"),
-                                "utc", orig=user.timezone
+                                "UTC", orig=user.timezone
                             ).strftime("%Y-%m-%dT%H:%M:%SZ")
                         }
 
@@ -239,7 +239,7 @@ class TimeClock():
                     "projectid": str(projectid),
                     "taskid": str(taskid),
                     "noteid": str(noteid),
-                    "start": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "start": dt.UTCnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "stop": "na"
                 }
 
@@ -260,7 +260,7 @@ class TimeClock():
         # Stop=None allows Start Timing to supply stop time to keep start/stop values in sync while
         # allowing stop timing to stop at the current time.
         if not has_stop:
-            timelog["stop"] = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            timelog["stop"] = dt.UTCnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         response = requests.put(aws_route + "/timelog/" + str(timelog.get("timelogid")), json=timelog)
         if response.status_code == 200:
             return 1
@@ -273,7 +273,7 @@ class TimeClock():
                 form.range_begin.data,
                 dt.min.time()
             ),
-            "utc", orig=user.timezone
+            "UTC", orig=user.timezone
             ).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         if form.range_end.data:
@@ -282,7 +282,7 @@ class TimeClock():
                     form.range_end.data,
                     dt.max.time()
                 ),
-                "utc", orig=user.timezone
+                "UTC", orig=user.timezone
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         else:
@@ -291,7 +291,7 @@ class TimeClock():
                     form.range_begin.data,
                     dt.max.time()
                 ),
-                "utc", orig=user.timezone
+                "UTC", orig=user.timezone
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         query = {
@@ -333,7 +333,7 @@ class TimeClock():
                     ).strftime("%Y-%m-%d")
             )   
             if row["timelogid"] == str(cur_tlid):
-                daterange.at[i, "hours"] = (dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
+                daterange.at[i, "hours"] = (dt.UTCnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
             elif not pd.isna(row["stop"]):
                 daterange.at[i, "hours"] = (dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
 
@@ -350,5 +350,3 @@ class TimeClock():
         sum_df = sum_df.append(sum_row, ignore_index=True)
 
         return sum_df
-
-    
