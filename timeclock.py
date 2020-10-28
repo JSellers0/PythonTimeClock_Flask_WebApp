@@ -239,7 +239,7 @@ class TimeClock():
                     "projectid": str(projectid),
                     "taskid": str(taskid),
                     "noteid": str(noteid),
-                    "start": dt.UTCnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "start": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "stop": "na"
                 }
 
@@ -260,7 +260,7 @@ class TimeClock():
         # Stop=None allows Start Timing to supply stop time to keep start/stop values in sync while
         # allowing stop timing to stop at the current time.
         if not has_stop:
-            timelog["stop"] = dt.UTCnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            timelog["stop"] = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         response = requests.put(aws_route + "/timelog/" + str(timelog.get("timelogid")), json=timelog)
         if response.status_code == 200:
             return 1
@@ -333,7 +333,7 @@ class TimeClock():
                     ).strftime("%Y-%m-%d")
             )   
             if row["timelogid"] == str(cur_tlid):
-                daterange.at[i, "hours"] = (dt.UTCnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
+                daterange.at[i, "hours"] = (dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
             elif not pd.isna(row["stop"]):
                 daterange.at[i, "hours"] = (dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
 
