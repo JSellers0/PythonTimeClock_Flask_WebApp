@@ -76,16 +76,16 @@ def start():
                 "projectid": session["project"].get("id"),
                 "taskid": session["task"].get("id"),
                 "noteid": session["note"].get("id"),
-                "start": session["start"],
+                "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "UTC", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
             timelog = timeclock.start_timing(form, current_user, current_timelog=current_timelog, stop=1)
         else:
             timelog = timeclock.start_timing(form, current_user)
         if timelog:
             session["timelogid"] = timelog.get("timelogid")
-            session["project"] = {"id": timelog.get("projectid"), "name": form.project.data.lower()}
-            session["task"] = {"id": timelog.get("taskid"), "name": form.task.data.lower()}
-            session["note"] = {"id": timelog.get("noteid"), "name": form.note.data.lower()}
+            session["project"] = {"id": str(timelog.get("projectid")), "name": form.project.data.lower()}
+            session["task"] = {"id": str(timelog.get("taskid")), "name": form.task.data.lower()}
+            session["note"] = {"id": str(timelog.get("noteid")), "name": form.note.data.lower()}
             session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), current_user.timezone).strftime("%Y-%m-%d %H:%M")
             session.pop("stop", None)
             return redirect(url_for("webtime"))
