@@ -100,9 +100,9 @@ def stop():
         current_timelog = {
                 "userid": current_user.userid,
                 "timelogid": session["timelogid"],
-                "projectid": str(session["project"].get("id")),
-                "taskid": str(session["task"].get("id")),
-                "noteid": str(session["note"].get("id")),
+                "projectid": session["project"].get("id"),
+                "taskid": session["task"].get("id"),
+                "noteid": session["note"].get("id"),
                 "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "UTC", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         if not timeclock.stop_timing(current_timelog):
