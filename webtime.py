@@ -130,7 +130,16 @@ def adjust_itemselect(item_type):
         if form.validate_on_submit():
             # ToDo: cache selected date so user doesn't have to re-select
             # ToDo: cache returned date range rows so we don't have to hit API again
-            session["row_list"] = timeclock.get_daterange_rows(form, current_user)
+            row_list = timeclock.get_daterange_rows(form, current_user)
+            for row in row_list:
+                row["start"] = timeclock.convert_timezone(dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"),
+                    current_user.timezone
+                    ).strftime("%Y-%m-%d %H:%M")
+                if row.get("stop"):
+                    row["stop"] = timeclock.convert_timezone(dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ"),
+                        current_user.timezone
+                        ).strftime("%Y-%m-%d %H:%M")
+            session["row_list"] = row_list
             return render_template("adjust_itemselect.html", items=session["row_list"], item_type=item_type)
         return render_template("adjust_dateselect.html", form=form)
     if item_type == "project":
