@@ -178,10 +178,7 @@ def adjust_item(item_type, id):
                     session["project"]["name"] = form.project.data.lower()
                     session["task"]["name"] = form.task.data.lower()
                     session["note"]["name"] = form.note.data.lower()
-                    session["start"] = timeclock.convert_timezone(
-                        dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                        "UTC", orig=current_user.timezone
-                        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+                    session["start"] = form.start.data
             flash("Item updated successfully!", "success")
             return redirect(url_for("adjust_itemselect", item_type=item_type))
         else:
