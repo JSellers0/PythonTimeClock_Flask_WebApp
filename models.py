@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
         self.timezone = timezone
 
     def __repr__(self):
-        return "User({}, {})".format(self.username, self.email)
+        return "User({}, {})".format(self.user_name, self.email)
 
     def get_id(self):
         return str(self.userid)

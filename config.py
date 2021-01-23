@@ -2,16 +2,16 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from secerts import mysql, host, ask
+from myshit import s_mysql, s_host, s_ask
 
 # ToDo: Make secret key , DB URI, API URI actually secret.
 
 app = Flask(__name__)
 
 
-app.secret_key = ask
+app.secret_key = s_ask
 
-db_uri = "mysql://clock:" + mysql + "@" + host + "/clock"
+db_uri = "mysql+pymysql://clock:" + s_mysql + "@" + s_host + "/clock"
 
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
