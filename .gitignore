@@ -1,4 +1,5 @@
 *.pyc
 .vscode/settings.json
-myshit.py
-.env
+myfb.py
+env_*
+requirements.txt
