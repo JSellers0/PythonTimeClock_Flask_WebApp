@@ -4,6 +4,7 @@ flask-bcrypt
 flask-login
 flask-sqlalchemy
 flask-wtf
+mysql-connector-python
 pandas
 python-dateutil
 python-dotenv
