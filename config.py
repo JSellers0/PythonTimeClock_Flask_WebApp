@@ -9,11 +9,11 @@ import os
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv('PYCLOCK_SK')
+app.secret_key = pcsk
 
 # ToDo: dev - sqlite
 
-db_uri = f"mysql://{os.getenv('PYCLOCK_MYSQL_USER')}:{os.getenv('PYCLOCK_MYSQL_PASS')}@{os.getenv('PYCLOCK_MYSQL_HOST')}/clock"
+db_uri = f"mysql://{pcmu}:{pcmp}@{pcmh}/clock"
 
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
