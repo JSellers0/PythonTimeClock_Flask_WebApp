@@ -1,11 +1,9 @@
-import sys
 import requests
 import json
 
 import pandas as pd
 
 from datetime import datetime as dt
-from datetime import timedelta
 from dateutil import tz
 from flask import flash
 
@@ -26,38 +24,39 @@ class TimeClock():
 
     def register_user(self, form):
         new_user = User(
-            form.user_name.data, 
+            form.user_name.data,
             form.email.data,
             bcrypt.generate_password_hash(form.password.data),
             form.timezone.data)
-        try: 
+        try:
             db.session.add(new_user)
             db.session.commit()
             return new_user
-        except Exception as e:
+        except Exception:
             return None
-    
+
     def login_user(self, form):
-        user = User.query.filter(User.user_name == form.user_name.data).one_or_none()
+        user = User.query.filter(
+            User.user_name == form.user_name.data).one_or_none()
 
         if user and bcrypt.check_password_hash(user.user_token, form.password.data):
             return user
         else:
             return
-    
+
     def get_timerow(self, id):
         response = requests.get(aws_route + "/timelog/{id}".format(id=str(id)))
         if response.status_code == 200:
             return response.json()
         else:
-            return None
-    
-    def get_projects(self):
+            return {}
+
+    def get_projects(self) -> dict:
         response = requests.get(aws_route + "/projects")
         if response.status_code == 200:
             return response.json()
         else:
-            return None
+            return {}
 
     def create_project(self, project_name):
         project = {"project_name": project_name}
@@ -65,14 +64,14 @@ class TimeClock():
         if response.status_code == 201:
             return response.json()["projectid"]
         else:
-            return None
+            return {}
 
     def get_tasks(self):
         response = requests.get(aws_route + "/tasks")
         if response.status_code == 200:
             return response.json()
         else:
-            return None
+            return {}
 
     def create_task(self, task_name):
         task = {"task_name": task_name}
@@ -80,14 +79,14 @@ class TimeClock():
         if response.status_code == 201:
             return response.json()["taskid"]
         else:
-            return None
+            return {}
 
     def get_notes(self):
         response = requests.get(aws_route + "/notes")
         if response.status_code == 200:
             return response.json()
         else:
-            return None
+            return {}
 
     def create_note(self, note_name):
         note = {"note_name": note_name}
@@ -95,7 +94,7 @@ class TimeClock():
         if response.status_code == 201:
             return response.json()["noteid"]
         else:
-            return None
+            return {}
 
     def get_list(self, list_name):
         if list_name == "projects":
@@ -107,25 +106,28 @@ class TimeClock():
         elif list_name == "notes":
             self.notes = self.get_notes()
             return [note["note_name"] for note in self.notes]
-    
+
     def update_item(self, form, item_type, id, user):
         if item_type == "project":
             project = {"project_name": form.project.data.lower()}
-            response = requests.put(aws_route + "/projects/" + str(id), params=project)
+            response = requests.put(
+                aws_route + "/projects/" + str(id), params=project)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
                 flash("Error. Project {} does not exist.".format(str(id)))
                 return 0
             elif response.status_code == 409:
-                flash("Error.  Project Name {} already exists.".format(form.project.data))
+                flash("Error.  Project Name {} already exists.".format(
+                    form.project.data))
                 return 0
             else:
                 flash("Error Updating Project: " + response.text, "danger")
                 return 0
         elif item_type == "task":
             task = {"task_name": form.task.data.lower()}
-            response = requests.put(aws_route + "/tasks/" + str(id), params=task)
+            response = requests.put(
+                aws_route + "/tasks/" + str(id), params=task)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
@@ -139,7 +141,8 @@ class TimeClock():
                 return 0
         elif item_type == "note":
             note = {"note_name": form.note.data.lower()}
-            response = requests.put(aws_route + "/notes/" + str(id), params=note)
+            response = requests.put(
+                aws_route + "/notes/" + str(id), params=note)
             if response.status_code == 200:
                 return 1
             elif response.status_code == 404:
@@ -153,62 +156,67 @@ class TimeClock():
                 return 0
         elif item_type == "time":
             if (form.project.data.lower() in self.get_list("projects")):
-                projectid = self.projects[[project["project_name"] for project in self.projects].index(form.project.data.lower())]["projectid"]
+                projectid = self.projects[[project["project_name"] for project in self.projects].index(
+                    form.project.data.lower())]["projectid"]
             else:
                 projectid = self.create_project(form.project.data.lower())
 
             if (form.task.data.lower() in self.get_list("tasks")):
-                taskid = self.tasks[[task["task_name"] for task in self.tasks].index(form.task.data.lower())]["taskid"]
+                taskid = self.tasks[[task["task_name"] for task in self.tasks].index(
+                    form.task.data.lower())]["taskid"]
             else:
                 taskid = self.create_task(form.task.data.lower())
 
             if (form.note.data.lower() in self.get_list("notes")):
-                noteid = self.notes[[note["note_name"] for note in self.notes].index(form.note.data.lower())]["noteid"]
+                noteid = self.notes[[note["note_name"] for note in self.notes].index(
+                    form.note.data.lower())]["noteid"]
             else:
                 noteid = self.create_note(form.note.data.lower())
 
             if projectid and taskid and noteid:
-                
+
                 if form.stop.data == "None":
                     timelog = {
-                            "userid": str(user.userid),
-                            "projectid": str(projectid),
-                            "taskid": str(taskid),
-                            "noteid": str(noteid),
-                            "start": self.convert_timezone(
-                                dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "UTC", orig=user.timezone
-                            ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            "stop": "na"
-                        }                   
+                        "userid": str(user.userid),
+                        "projectid": str(projectid),
+                        "taskid": str(taskid),
+                        "noteid": str(noteid),
+                        "start": self.convert_timezone(
+                            dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
+                            "UTC", orig=user.timezone
+                        ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "stop": "na"
+                    }
                 else:
                     timelog = {
-                            "userid": str(user.userid),
-                            "projectid": str(projectid),
-                            "taskid": str(taskid),
-                            "noteid": str(noteid),
-                            "start": self.convert_timezone(
-                                dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
-                                "UTC", orig=user.timezone
-                            ).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            "stop": self.convert_timezone(
-                                dt.strptime(form.stop.data, "%Y-%m-%d %H:%M"),
-                                "UTC", orig=user.timezone
-                            ).strftime("%Y-%m-%dT%H:%M:%SZ")
-                        }
+                        "userid": str(user.userid),
+                        "projectid": str(projectid),
+                        "taskid": str(taskid),
+                        "noteid": str(noteid),
+                        "start": self.convert_timezone(
+                            dt.strptime(form.start.data, "%Y-%m-%d %H:%M"),
+                            "UTC", orig=user.timezone
+                        ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "stop": self.convert_timezone(
+                            dt.strptime(form.stop.data, "%Y-%m-%d %H:%M"),
+                            "UTC", orig=user.timezone
+                        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+                    }
 
                 old_timelog = self.get_timerow(id)
-                    
-                response = requests.put(aws_route + "/timelog/" + str(id), json=timelog)
+
+                response = requests.put(
+                    aws_route + "/timelog/" + str(id), json=timelog)
                 if response.status_code == 200:
-                    if form.adjacent.data == True:
+                    if form.adjacent.data is True:
                         if old_timelog:
                             # Need to build search for timelog row by userid + start or stop time
                             # if start match, update with form.stop.data
                             # if stop match, update with form.start.data
                             pass
                         else:
-                            flash("Error getting timelog row for adjacent check.", "danger")
+                            flash(
+                                "Error getting timelog row for adjacent check.", "danger")
                     if item_type == "time":
                         return timelog
                     else:
@@ -219,29 +227,32 @@ class TimeClock():
 
     def start_timing(self, form, user, current_timelog=None, stop=0):
         if (form.project.data.lower() in self.get_list("projects")):
-            projectid = self.projects[[project["project_name"] for project in self.projects].index(form.project.data.lower())]["projectid"]
+            projectid = self.projects[[project["project_name"] for project in self.projects].index(
+                form.project.data.lower())]["projectid"]
         else:
             projectid = self.create_project(form.project.data.lower())
 
         if (form.task.data.lower() in self.get_list("tasks")):
-            taskid = self.tasks[[task["task_name"] for task in self.tasks].index(form.task.data.lower())]["taskid"]
+            taskid = self.tasks[[task["task_name"] for task in self.tasks].index(
+                form.task.data.lower())]["taskid"]
         else:
             taskid = self.create_task(form.task.data.lower())
 
         if (form.note.data.lower() in self.get_list("notes")):
-            noteid = self.notes[[note["note_name"] for note in self.notes].index(form.note.data.lower())]["noteid"]
+            noteid = self.notes[[note["note_name"] for note in self.notes].index(
+                form.note.data.lower())]["noteid"]
         else:
             noteid = self.create_note(form.note.data.lower())
 
         if projectid and taskid and noteid:
             timelog = {
-                    "userid": str(user.userid),
-                    "projectid": str(projectid),
-                    "taskid": str(taskid),
-                    "noteid": str(noteid),
-                    "start": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "stop": "na"
-                }
+                "userid": str(user.userid),
+                "projectid": str(projectid),
+                "taskid": str(taskid),
+                "noteid": str(noteid),
+                "start": dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "stop": "na"
+            }
 
             tl_resp = requests.post(aws_route + "/timelog", json=timelog)
             if tl_resp.status_code == 201:
@@ -255,13 +266,14 @@ class TimeClock():
         else:
             flash("Something went wrong with id assignment", "danger")
             return None
-        
+
     def stop_timing(self, timelog, has_stop=False):
         # Stop=None allows Start Timing to supply stop time to keep start/stop values in sync while
         # allowing stop timing to stop at the current time.
         if not has_stop:
             timelog["stop"] = dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-        response = requests.put(aws_route + "/timelog/" + str(timelog.get("timelogid")), json=timelog)
+        response = requests.put(
+            aws_route + "/timelog/" + str(timelog.get("timelogid")), json=timelog)
         if response.status_code == 200:
             return 1
         else:
@@ -274,7 +286,7 @@ class TimeClock():
                 dt.min.time()
             ),
             "UTC", orig=user.timezone
-            ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
         )
         if form.range_end.data:
             range_end = (self.convert_timezone(
@@ -283,7 +295,7 @@ class TimeClock():
                     dt.max.time()
                 ),
                 "UTC", orig=user.timezone
-                ).strftime("%Y-%m-%dT%H:%M:%SZ")
+            ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         else:
             range_end = (self.convert_timezone(
@@ -292,13 +304,13 @@ class TimeClock():
                     dt.max.time()
                 ),
                 "UTC", orig=user.timezone
-                ).strftime("%Y-%m-%dT%H:%M:%SZ")
+            ).strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         query = {
             "userid": user.userid,
             "range_begin": range_begin,
             "range_end": range_end
-            }
+        }
         response = requests.get(aws_route+"/timelog/daterange", params=query)
         if response.status_code == 200:
             date_range_rows = json.loads(response.json())
@@ -308,24 +320,26 @@ class TimeClock():
             return 0
 
     def process_daterange_rows(self, daterange_rows, timezone, cur_tlid):
-        if type(daterange_rows) == int:
+        if isinstance(daterange_rows, int):
             return 0
         daterange = pd.DataFrame()
         for row in daterange_rows:
-            daterange = daterange.append(row, ignore_index=True)
+            daterange = daterange.append(row, ignore_index=True)  # type: ignore
 
         # preprocess: Convert times; Fill current timelog stop with current time; fill report_date
         for i, row in daterange.iterrows():
             daterange.at[i, "report_date"] = (
                 self.convert_timezone(
-                    dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"), 
+                    dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"),
                     timezone
-                    ).strftime("%Y-%m-%d")
-            )   
+                ).strftime("%Y-%m-%d")
+            )
             if row["timelogid"] == str(cur_tlid):
-                daterange.at[i, "hours"] = (dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
+                daterange.at[i, "hours"] = (
+                    dt.utcnow() - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
             elif not pd.isna(row["stop"]):
-                daterange.at[i, "hours"] = (dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
+                daterange.at[i, "hours"] = (dt.strptime(
+                    row["stop"], "%Y-%m-%dT%H:%M:%SZ") - dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ")).seconds / 3600
 
         # Sum rows by date-project-task-note
         sum_df = daterange[["report_date", "project_name", "task_name", "note_name", "hours"]].groupby(by=[
@@ -335,8 +349,9 @@ class TimeClock():
         sum_df["hours"] = sum_df["hours"].apply(lambda x: round(x, 1))
 
         # Sum hours by day and add to sum_df
-        sum_row = sum_df[["report_date", "hours"]].groupby("report_date").sum().reset_index()
+        sum_row = sum_df[["report_date", "hours"]].groupby(
+            "report_date").sum().reset_index()
         sum_row["project_name"] = "date_total_hours"
-        sum_df = sum_df.append(sum_row, ignore_index=True)
+        sum_df = sum_df.append(sum_row, ignore_index=True)  # type: ignore
 
         return sum_df

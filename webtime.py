@@ -1,35 +1,29 @@
-from dateutil import tz
-from datetime import datetime as dt
-
+from config import app
 from flask import render_template, url_for, redirect, request, flash, session
 from flask_login import login_user, current_user, logout_user, login_required
-
-from forms import (RegisterForm, LoginForm, StartForm, DateSelectForm, ItemEditForm, UserForm)
-
-from config import app
+from forms import (RegisterForm, LoginForm, StartForm,
+                   DateSelectForm, ItemEditForm, UserForm)
+from datetime import datetime as dt
 from timeclock import TimeClock
 
+
 timeclock = TimeClock()
+
 
 @app.route("/", methods=["GET", "PUT"])
 def webtime():
     if "row_list" in session:
         session.pop("row_list", None)
     message = "Click Start to start timing!"
+    pname = session["project"].get("name", None)
+    tname = session["task"].get("name", None)
+    nname = session["note"].get("name", None)
     if "stop" in session:
-        message = "Stopped tracking {pname} - {tname} \n {nname}".format(
-            pname=session["project"].get("name"),
-            tname=session["task"].get("name"),
-            nname=session["note"].get("name")
-        )
+        message = f"Stopped tracking {pname} - {tname} \n {nname}"
     elif "timelogid" in session:
-        message = "Started {pname} - {tname} \n{nname} at {start}".format(
-            pname=session["project"].get("name"),
-            tname=session["task"].get("name"),
-            nname=session["note"].get("name"),
-            start=session["start"]
-        )
+        message = f"Started {pname} - {tname} \n{nname} at {session['start']}"
     return render_template("webtime.html", title="PythonTimeClock", message=message)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -38,11 +32,13 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if timeclock.register_user(form):
-            flash("Account Created for {}!  Please log in.".format(form.user_name.data), "success")
+            flash("Account Created for {}!  Please log in.".format(
+                form.user_name.data), "success")
             return redirect(url_for("login"))
         else:
             flash("Error creating account.  Please try again.", "danger")
     return render_template("register.html", title="Registration", form=form)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -56,8 +52,10 @@ def login():
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("webtime"))
         else:
-            flash("User not recognized.  Please check your info or Register an Account!", "danger")
+            flash(
+                "User not recognized.  Please check your info or Register an Account!", "danger")
     return render_template("login.html", title="Login", form=form)
+
 
 @app.route("/start", methods=["POST", "GET"])
 @login_required
@@ -76,21 +74,31 @@ def start():
                 "projectid": session["project"].get("id"),
                 "taskid": session["task"].get("id"),
                 "noteid": session["note"].get("id"),
-                "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "UTC", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
+                "start": timeclock.convert_timezone(
+                    dt.strptime(session["start"], "%Y-%m-%d %H:%M"),
+                    "UTC",
+                    orig=current_user.timezone
+                ).strftime("%Y-%m-%dT%H:%M:%SZ")
             }
-            timelog = timeclock.start_timing(form, current_user, current_timelog=current_timelog, stop=1)
+            timelog = timeclock.start_timing(
+                form, current_user, current_timelog=current_timelog, stop=1)
         else:
             timelog = timeclock.start_timing(form, current_user)
         if timelog:
             session["timelogid"] = timelog.get("timelogid")
-            session["project"] = {"id": str(timelog.get("projectid")), "name": form.project.data.lower()}
-            session["task"] = {"id": str(timelog.get("taskid")), "name": form.task.data.lower()}
-            session["note"] = {"id": str(timelog.get("noteid")), "name": form.note.data.lower()}
-            session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get("start"), "%Y-%m-%dT%H:%M:%SZ"), current_user.timezone).strftime("%Y-%m-%d %H:%M")
+            session["project"] = {"id": str(timelog.get(
+                "projectid")), "name": form.project.data.lower()}
+            session["task"] = {"id": str(timelog.get(
+                "taskid")), "name": form.task.data.lower()}
+            session["note"] = {"id": str(timelog.get(
+                "noteid")), "name": form.note.data.lower()}
+            session["start"] = timeclock.convert_timezone(dt.strptime(timelog.get(
+                "start"), "%Y-%m-%dT%H:%M:%SZ"), current_user.timezone).strftime("%Y-%m-%d %H:%M")
             session.pop("stop", None)
             return redirect(url_for("webtime"))
-    return render_template("start.html", title="Start Timing", form=form, 
-        projects=project_list, tasks=task_list, notes=note_list)
+    return render_template("start.html", title="Start Timing", form=form,
+                           projects=project_list, tasks=task_list, notes=note_list)
+
 
 @app.route("/stop", methods=["GET", "PUT"])
 @login_required
@@ -98,13 +106,17 @@ def start():
 def stop():
     if "timelogid" in session:
         current_timelog = {
-                "userid": current_user.userid,
-                "timelogid": session["timelogid"],
-                "projectid": session["project"].get("id"),
-                "taskid": session["task"].get("id"),
-                "noteid": session["note"].get("id"),
-                "start": timeclock.convert_timezone(dt.strptime(session["start"], "%Y-%m-%d %H:%M"), "UTC", orig=current_user.timezone).strftime("%Y-%m-%dT%H:%M:%SZ")
-            }
+            "userid": current_user.userid,
+            "timelogid": session["timelogid"],
+            "projectid": session["project"].get("id"),
+            "taskid": session["task"].get("id"),
+            "noteid": session["note"].get("id"),
+            "start": timeclock.convert_timezone(
+                dt.strptime(session["start"], "%Y-%m-%d %H:%M"),
+                "UTC",
+                orig=current_user.timezone
+            ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        }
         if not timeclock.stop_timing(current_timelog):
             flash("There was an error stopping the timeclock.", "danger")
         else:
@@ -115,10 +127,12 @@ def stop():
         flash("Not currently timing anything.", "danger")
     return redirect(url_for("webtime"))
 
+
 @app.route("/adjust")
 @login_required
 def adjust():
     return render_template("adjust.html")
+
 
 @app.route("/adjust/<string:item_type>/", methods=["GET", "POST"])
 @login_required
@@ -133,12 +147,12 @@ def adjust_itemselect(item_type):
             row_list = timeclock.get_daterange_rows(form, current_user)
             for row in row_list:
                 row["start"] = timeclock.convert_timezone(dt.strptime(row["start"], "%Y-%m-%dT%H:%M:%SZ"),
-                    current_user.timezone
-                    ).strftime("%Y-%m-%d %H:%M")
+                                                          current_user.timezone
+                                                          ).strftime("%Y-%m-%d %H:%M")
                 if row.get("stop"):
                     row["stop"] = timeclock.convert_timezone(dt.strptime(row["stop"], "%Y-%m-%dT%H:%M:%SZ"),
-                        current_user.timezone
-                        ).strftime("%Y-%m-%d %H:%M")
+                                                             current_user.timezone
+                                                             ).strftime("%Y-%m-%d %H:%M")
             session["row_list"] = row_list
             return render_template("adjust_itemselect.html", items=session["row_list"], item_type=item_type)
         return render_template("adjust_dateselect.html", form=form)
@@ -150,17 +164,22 @@ def adjust_itemselect(item_type):
         item_list = timeclock.get_notes()
     return render_template("adjust_itemselect.html", items=item_list, item_type=item_type)
 
+
 @app.route("/adjust/item/<string:item_type>/<int:id>", methods=["GET", "POST"])
 @login_required
 def adjust_item(item_type, id):
     if item_type == "project":
-        item = [project for project in timeclock.get_projects() if project["projectid"] == id][0]
+        item = [project for project in timeclock.get_projects()
+                if project["projectid"] == id][0]
     elif item_type == "task":
-        item = [task for task in timeclock.get_tasks() if task["taskid"] == id][0]
+        item = [task for task in timeclock.get_tasks() if task["taskid"]
+                == id][0]
     elif item_type == "note":
-        item = [note for note in timeclock.get_notes() if note["noteid"] == id][0]
+        item = [note for note in timeclock.get_notes() if note["noteid"]
+                == id][0]
     elif item_type == "time":
-        item = [time for time in session["row_list"] if time["timelogid"] == str(id)][0]
+        item = [time for time in session["row_list"]
+                if time["timelogid"] == str(id)][0]
     form = ItemEditForm()
     if form.validate_on_submit():
         if timeclock.update_item(form, item_type, id, current_user):
@@ -185,23 +204,27 @@ def adjust_item(item_type, id):
             flash("Error updating item!", "danger")
     return render_template("adjust_item.html", form=form, item_type=item_type, item=item)
 
+
 @app.route("/report", methods=["GET", "POST"])
 @login_required
 def report():
     form = DateSelectForm()
     if form.validate_on_submit():
-        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(form, current_user), current_user.timezone, session.get("timelogid"))
-        if type(report_data) != int:
+        report_data = timeclock.process_daterange_rows(timeclock.get_daterange_rows(
+            form, current_user), current_user.timezone, session.get("timelogid"))
+        if not isinstance(report_data, int):
             return render_template("report_result.html", title="Report Result", report_data=report_data)
         else:
             flash("No data for date range selected.", "danger")
     return render_template("report.html", title="Report Date Selection", form=form)
+
 
 @app.route("/users")
 @login_required
 def users():
     form = UserForm()
     return render_template("users.html", user=current_user, form=form)
+
 
 @app.route("/logout")
 @login_required
