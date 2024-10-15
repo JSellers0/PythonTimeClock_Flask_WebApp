@@ -8,7 +8,7 @@
     {% if current_user.is_authenticated %}
     <div>
         {% if message_lines == 1 %}
-            <h1 id="message">{{ message }}</h1>
+            <h1 id="message">{{ message[0] }}</h1>
         {% else %}
             <h2 id="message">
             {% for line in message %}
