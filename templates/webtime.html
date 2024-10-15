@@ -7,7 +7,7 @@
 <div class="content-section">
     {% if current_user.is_authenticated %}
     <div>
-        {% if len(message) == 1 %}
+        {% if message_lines == 1 %}
             <h1 id="message">{{ message }}</h1>
         {% else %}
             <h2 id="message">

@@ -28,7 +28,9 @@ def webtime():
             nname.get('name'),
             f"at {session['start']}"
         ]
-    return render_template("webtime.html", title="PythonTimeClock", message=message)
+    return render_template("webtime.html",
+                           title="PythonTimeClock",
+                           message=message, message_lines=len(message))
 
 
 @app.route("/register", methods=["GET", "POST"])
