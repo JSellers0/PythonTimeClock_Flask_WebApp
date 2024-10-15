@@ -15,13 +15,13 @@ def webtime():
     if "row_list" in session:
         session.pop("row_list", None)
     message = "Click Start to start timing!"
-    pname = session["project"].get("name", None)
-    tname = session["task"].get("name", None)
-    nname = session["note"].get("name", None)
+    pname = session.get("project", {})
+    tname = session.get("task", {})
+    nname = session.get("note", {})
     if "stop" in session:
-        message = f"Stopped tracking {pname} - {tname} \n {nname}"
+        message = f"Stopped tracking {pname.get('name')} - {tname.get('name')} \n {nname.get('name')}"
     elif "timelogid" in session:
-        message = f"Started {pname} - {tname} \n{nname} at {session['start']}"
+        message = f"Started {pname.get('name')} - {tname.get('name')} <br> {nname.get('name')} at {session['start']}"
     return render_template("webtime.html", title="PythonTimeClock", message=message)
 
 
@@ -238,3 +238,7 @@ def logout():
     session.pop("stop", None)
     flash("You have successfully logged out.", "success")
     return redirect(url_for("webtime"))
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
