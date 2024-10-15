@@ -11,14 +11,11 @@
             <h1 id="message">{{ message }}</h1>
         {% elif "at" in message %}
             <h2 id="message">
-                {{ message[ : message.index("\n")] }}<br/>
-                {{ message[message.index("\n") : message.index("at")] }}<br/>
-                {{ message[message.index("at") : ] }}
+                {{ message }}
             </h2>
         {% elif "Stopped" in message %}
             <h2 id="message">
-                {{ message[ : message.index("\n")] }}<br/>
-                {{ message[message.index("\n") : ] }}
+                {{ message }}
             </h2>
         {% endif %}
     </div><br/>
