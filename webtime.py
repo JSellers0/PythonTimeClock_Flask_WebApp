@@ -6,7 +6,6 @@ from forms import (RegisterForm, LoginForm, StartForm,
 from datetime import datetime as dt
 from timeclock import TimeClock
 
-
 timeclock = TimeClock()
 
 
@@ -14,14 +13,21 @@ timeclock = TimeClock()
 def webtime():
     if "row_list" in session:
         session.pop("row_list", None)
-    message = "Click Start to start timing!"
+    message = ["Click Start to start timing!"]
     pname = session.get("project", {})
     tname = session.get("task", {})
     nname = session.get("note", {})
     if "stop" in session:
-        message = f"Stopped tracking {pname.get('name')} - {tname.get('name')} \n {nname.get('name')}"
+        message = [
+            f"Stopped tracking {pname.get('name')} - {tname.get('name')}",
+            f"\n {nname.get('name')}"
+        ]
     elif "timelogid" in session:
-        message = f"Started {pname.get('name')} - {tname.get('name')} <br> {nname.get('name')} at {session['start']}"
+        message = [
+            f"Started {pname.get('name')} - {tname.get('name')}",
+            nname.get('name'),
+            f"at {session['start']}"
+        ]
     return render_template("webtime.html", title="PythonTimeClock", message=message)
 
 

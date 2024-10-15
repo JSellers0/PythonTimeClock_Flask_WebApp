@@ -7,15 +7,13 @@
 <div class="content-section">
     {% if current_user.is_authenticated %}
     <div>
-        {% if "Click" in message %}
+        {% if len(message) == 1 %}
             <h1 id="message">{{ message }}</h1>
-        {% elif "at" in message %}
+        {% else %}
             <h2 id="message">
-                {{ message }}
-            </h2>
-        {% elif "Stopped" in message %}
-            <h2 id="message">
-                {{ message }}
+            {% for line in message %}
+                {{ line }} <br>
+            {% endfor %}
             </h2>
         {% endif %}
     </div><br/>
